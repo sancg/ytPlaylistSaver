@@ -1,35 +1,49 @@
+import { Video } from '../types/video';
+
 (() => {
   const PLAY_LIST = [];
   const locatorPlayList = document.querySelectorAll(
     '#secondary-inner .playlist-items  a#wc-endpoint'
-  );
+  ) as NodeListOf<HTMLAnchorElement> | null;
+
+  if (!locatorPlayList) {
+    return { error_message: 'general Playlist locator not found' };
+  }
 
   for (let vid of locatorPlayList) {
-    const video = {};
+    const video: Video = { id: null, title: null, url: null };
 
-    video.url = vid.href;
     video.id = new URL(vid.href).searchParams.get('v');
+    video.url = vid.href;
 
-    video.thumbImg = vid.querySelector('yt-image > img').src;
-    video.title = vid.querySelector('#meta #video-title').ariaLabel;
-    video.publishedBy = video.title.split('게시자:').pop().trim();
+    const isImg = vid.querySelector('yt-image > img') as HTMLImageElement;
+    video.thumbImg = isImg?.src;
 
-    vid.querySelector('#index')?.textContent != '' ? (video.currentWatch = true) : false;
+    video.title = vid.querySelector('#meta #video-title')?.ariaLabel ?? null;
+    video.publishedBy = video.title?.split('게시자:').pop()?.trim();
 
-    video.timeLenght = vid
+    vid.querySelector('#index')?.textContent == '▶' ? (video.currentIndex = true) : false;
+
+    video.timeLength = vid
       .querySelector('#thumbnail-container #time-status #text')
-      .textContent.trim();
+      ?.textContent?.trim();
     // console.log(video)
     PLAY_LIST.push(video);
   }
-  const currentIndex = PLAY_LIST.findIndex((p) => p.currentWatch);
-  const result = JSON.stringify({ currentIndex, playList: PLAY_LIST });
+  const currentIndex = PLAY_LIST.findIndex((p) => p.currentIndex);
+  const result = { currentIndex, playList: PLAY_LIST };
+  const userResponse = confirm('Save Playlist?');
+
+  if (!userResponse) {
+    console.log(result);
+    return;
+  }
 
   // Ask user for playlist name
   const fileName = prompt('Enter a name for your playlist file:', 'playlist') || 'playlist';
 
   // Save JSON file
-  const blob = new Blob([result], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify(result)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `${fileName}.json`;
