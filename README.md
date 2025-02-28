@@ -1,50 +1,44 @@
-# React + TypeScript + Vite
+# Playlist Saver a web extension for YouTube
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React TS project for saving playlist locally from YouTube in a json format.
 
-Currently, two official plugins are available:
+## Mods
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+the `vite.config.ts` file was modified to build the contentScripts needed in the communication with the activeTab on the chrome browser.
 
-## Expanding the ESLint configuration
+### Interesting facts about chrome extensions
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+#### Background Scripts vs. Content Scripts in Chrome Extensions
 
-- Configure the top-level `parserOptions` property like this:
+| Feature               | Background Scripts                                                                         | Content Scripts                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| **Execution Context** | Runs in the background, separate from web pages                                            | Runs inside the context of a web page                                          |
+| **Access to DOM**     | ❌ Cannot directly access the page DOM                                                     | ✅ Can directly access and manipulate the DOM                                  |
+| **Persistent?**       | 🚫 No (in Manifest V3, it uses service workers)                                            | ✅ Yes, as long as the page is open                                            |
+| **Messaging**         | ✅ Can communicate with content scripts and popup scripts via `chrome.runtime.sendMessage` | ✅ Can communicate with background scripts via `chrome.runtime.sendMessage`    |
+| **Best Use Case**     | Handling API calls, event listeners, alarms, persistent storage, extension management      | Injecting scripts into web pages, modifying page content, scraping data        |
+| **File Location**     | Defined in `background.service_worker` in `manifest.json`                                  | Defined in `content_scripts` in `manifest.json`                                |
+| **Permissions**       | Requires permissions like `"background"`, `"storage"`, `"alarms"`                          | Requires permissions to match URL patterns (e.g., `"matches": ["<all_urls>"]`) |
+| **Example Usage**     | Listening for browser events, handling long-running tasks                                  | Changing webpage styles, reading text content from a webpage                   |
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
+#### Example Manifest Configuration
+
+Background Script (Manifest V3)
+
+```json
+{
+  "background": {
+    "service_worker": "background.js"
   },
-})
+  "permissions": ["storage", "alarms"]
+}
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Contributing
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Pull requests are welcome. For major changes, please open an issue first
+to discuss what you would like to change.
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```
+
 ```
