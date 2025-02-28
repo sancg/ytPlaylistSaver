@@ -1,15 +1,17 @@
 {
   "manifest_version": 3,
   "name": "Playlist Saver",
-  "version": "1.0",
+  "version": "0.0.1",
   "description": "YouTube Playlist saver in a local file",
   "action": {
     "default_popup": "index.html",
-    "default_icon": {
-      "16": "icon_16.png",
-      "48": "icon_16.png",
-      "128": "icon_16.png"
-    }
+    "default_icon": "logo.png"
   },
-  "permissions": ["activeTab"]
+  "permissions": ["activeTab", "scripting"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["/assets/app/contentScript.js"]
+    }
+  ]
 }

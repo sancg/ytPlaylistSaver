@@ -8,3 +8,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+html,
+body {
+  min-width: 286px;
+  min-height: 33px;
+}
