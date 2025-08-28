@@ -7,7 +7,8 @@
     "default_popup": "index.html",
     "default_icon": "logo.png"
   },
-  "permissions": ["activeTab", "scripting"],
+  "options_page": "playlist_viewer.html",
+  "permissions": ["activeTab", "scripting", "storage"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
