@@ -25,7 +25,14 @@ export const Popup = () => {
     if (playlist) {
       const currentIndex = playlist.findIndex((p: Video) => p.currentIndex);
       const exportResult = { currentIndex, playlist };
-      console.log(exportResult);
+      const fileName = prompt('Playlist Name:', 'playlist') || 'playlist';
+
+      // Save JSON file
+      const blob = new Blob([JSON.stringify(exportResult)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${fileName}.json`;
+      a.click();
     }
   };
 

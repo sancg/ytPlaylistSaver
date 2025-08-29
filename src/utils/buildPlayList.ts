@@ -2,6 +2,7 @@ import type { Video } from '../types/video';
 
 const buildPlaylist = (ctx: Document) => {
   const playlist: Video[] = [];
+
   let locatorPlaylist = ctx.querySelectorAll(
     '#secondary-inner .playlist-items  a#wc-endpoint'
   ) as NodeListOf<HTMLAnchorElement> | null;
@@ -39,7 +40,7 @@ const buildPlaylist = (ctx: Document) => {
     playlist.push(video);
   }
 
-  return { playlist, error: null };
+  return { error: null, playlist };
 };
 
 export { buildPlaylist };

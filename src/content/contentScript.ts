@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     console.log({ result });
-    return sendResponse({ playlist: result });
+    return sendResponse({ playlist: result.playlist });
   }
 
   return;
