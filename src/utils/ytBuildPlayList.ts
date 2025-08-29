@@ -1,4 +1,4 @@
-import { Video } from '../types/video';
+import type { Video } from '../types/video';
 
 (() => {
   const PLAY_LIST = [];
@@ -11,15 +11,15 @@ import { Video } from '../types/video';
   }
 
   for (let vid of locatorPlayList) {
-    const video: Video = { id: null, title: null, url: null };
+    const video: Video = {};
 
-    video.id = new URL(vid.href).searchParams.get('v');
+    video.id = new URL(vid.href).searchParams.get('v')!;
     video.url = vid.href;
 
     const isImg = vid.querySelector('yt-image > img') as HTMLImageElement;
     video.thumbImg = isImg?.src;
 
-    video.title = vid.querySelector('#meta #video-title')?.ariaLabel ?? null;
+    video.title = vid.querySelector('#meta #video-title')?.ariaLabel!;
     video.publishedBy = video.title?.split('게시자:').pop()?.trim();
 
     vid.querySelector('#index')?.textContent == '▶' ? (video.currentIndex = true) : false;

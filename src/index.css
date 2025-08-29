@@ -1,9 +1,8 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import 'tailwindcss';
 
-  font-synthesis: none;
+:root {
+  font-family: 'Noto Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
+
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -11,6 +10,5 @@
 
 html,
 body {
-  min-width: 286px;
-  min-height: 33px;
+  font-family: 'Noto Sans';
 }
