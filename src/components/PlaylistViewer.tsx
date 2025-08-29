@@ -5,12 +5,7 @@ import { createRoot } from 'react-dom/client';
 
 import type { Video } from '../types/video';
 import { extractYouTubeID } from '../utils/extraYoutube';
-// type Video = {
-//   id: string;
-//   title: string;
-//   thumbnail: string;
-//   url: string;
-// };
+
 const STORAGE_KEY = 'playlist';
 
 export const PlaylistViewer: React.FC = () => {
@@ -45,10 +40,11 @@ export const PlaylistViewer: React.FC = () => {
         if (Array.isArray(parseObject?.playList)) {
           const uploadedPlaylist: Video[] = parseObject?.playList.map((v: Video) => {
             if (!v.id) {
-              v.id = extractYouTubeID(v.url!);
+              v.id = extractYouTubeID(v.url!) ?? undefined;
             }
             return v;
           });
+
           console.log({ uploadedPlaylist });
           setPlaylist(uploadedPlaylist);
         } else {

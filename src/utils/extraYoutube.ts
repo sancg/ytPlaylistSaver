@@ -3,7 +3,7 @@ export function extractYouTubeID(url: string) {
     if (!url) return null;
     // support youtu.be short links
     const u = new URL(url);
-    console.log({ extractingID: u });
+    // console.log({ extractingID: u });
     if (u.hostname.includes('youtu.be')) {
       return u.pathname.slice(1);
     }

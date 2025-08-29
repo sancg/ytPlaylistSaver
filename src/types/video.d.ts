@@ -1,7 +1,7 @@
 type Video = {
-  id: string | null;
-  title: string | null;
-  url: string | null;
+  id?: string;
+  title?: string;
+  url?: string;
   thumbImg?: string;
   publishedBy?: string;
   timeLength?: string;

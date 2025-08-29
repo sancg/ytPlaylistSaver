@@ -1,25 +1,33 @@
 import type { Video } from '../types/video';
 
 const buildPlaylist = (ctx: Document) => {
-  const playlist = [];
-  const locatorPlayList = ctx.querySelectorAll(
+  const playlist: Video[] = [];
+  let locatorPlaylist = ctx.querySelectorAll(
     '#secondary-inner .playlist-items  a#wc-endpoint'
   ) as NodeListOf<HTMLAnchorElement> | null;
 
-  if (!locatorPlayList) {
-    return { error_message: 'general Playlist locator not found' };
+  if (!locatorPlaylist || locatorPlaylist.length < 1) {
+    console.log('Trying Mobile View Selector');
+    locatorPlaylist = ctx.querySelectorAll('#primary-inner .playlist-items a#wc-endpoint');
   }
 
-  for (let vid of locatorPlayList) {
-    const video: Video = { id: null, title: null, url: null };
+  if (!locatorPlaylist || locatorPlaylist.length < 1) {
+    const obj = { error: 'general Playlist locator not found', playlist };
+    console.error(obj);
+    return obj;
+  }
 
-    video.id = new URL(vid.href).searchParams.get('v');
+  for (let vid of locatorPlaylist) {
+    const video: Video = {};
+
+    video.id = new URL(vid.href).searchParams.get('v')!;
     video.url = vid.href;
 
     const isImg = vid.querySelector('yt-image > img') as HTMLImageElement;
     video.thumbImg = isImg?.src;
 
-    video.title = vid.querySelector('#meta #video-title')?.ariaLabel ?? null;
+    video.title = vid.querySelector('#meta #video-title')?.ariaLabel!;
+
     video.publishedBy = video.title?.split('게시자:').pop()?.trim();
 
     vid.querySelector('#index')?.textContent == '▶' ? (video.currentIndex = true) : false;
@@ -27,11 +35,11 @@ const buildPlaylist = (ctx: Document) => {
     video.timeLength = vid
       .querySelector('#thumbnail-container #time-status #text')
       ?.textContent?.trim();
-    // console.log(video)
+
     playlist.push(video);
   }
 
-  return { playlist };
+  return { playlist, error: null };
 };
 
 export { buildPlaylist };

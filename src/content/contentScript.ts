@@ -1,15 +1,18 @@
-import { GET_PLAYLIST } from '../utils/actions';
 import { buildPlaylist } from '../utils/buildPlayList';
-
 console.log('Content script loaded');
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log({ request, sender });
-  if (request.action === GET_PLAYLIST) {
-    const response = buildPlaylist(document);
-    console.log('Message received in content script:', response);
-    sendResponse({ response });
+
+  if (request.action === 'get_playlist_from_youtube') {
+    const result = buildPlaylist(document);
+    if (result.error) {
+      return sendResponse({ error: result.error });
+    }
+
+    console.log({ result });
+    return sendResponse({ playlist: result });
   }
 
-  sendResponse({ success: false });
+  return;
 });
