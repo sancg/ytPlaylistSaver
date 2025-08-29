@@ -27,6 +27,20 @@ export const PlaylistViewer: React.FC = () => {
     }
   }, [playlist]);
 
+  const normalizePlaylist = (obj: {
+    playlist?: Video[];
+    playList?: Video[];
+  }): Video[] | null => {
+    // pick the first non-null key
+    const list = obj.playlist ?? obj.playList;
+    if (!Array.isArray(list)) return null;
+
+    return list.map((v) => ({
+      ...v,
+      id: v.id ?? extractYouTubeID(v.url ?? '') ?? undefined,
+    }));
+  };
+
   // Handle File Upload
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -36,20 +50,14 @@ export const PlaylistViewer: React.FC = () => {
     reader.onload = (e) => {
       try {
         const parseObject = JSON.parse(e.target?.result as string);
+        const uploadedPlaylist = normalizePlaylist(parseObject);
 
-        if (Array.isArray(parseObject?.playList)) {
-          const uploadedPlaylist: Video[] = parseObject?.playList.map((v: Video) => {
-            if (!v.id) {
-              v.id = extractYouTubeID(v.url!) ?? undefined;
-            }
-            return v;
-          });
-
-          console.log({ uploadedPlaylist });
-          setPlaylist(uploadedPlaylist);
-        } else {
+        if (!uploadedPlaylist) {
           console.error('Invalid JSON format. Expected an array of videos.');
+          return;
         }
+
+        setPlaylist(uploadedPlaylist);
       } catch (err) {
         console.error('Error parsing JSON file', err);
       }
@@ -64,9 +72,9 @@ export const PlaylistViewer: React.FC = () => {
   };
 
   return (
-    <div className='flex h-screen bg-gray-100'>
+    <div className='flex h-screen bg-yt-bg overflow-y-hidden'>
       {/* Main - Video Player */}
-      <main className='flex-1 flex items-center justify-center bg-black'>
+      <main className='flex-1 flex items-center my-2 ml-2 justify-center bg-[#0f0f0f]'>
         {currentVideo ? (
           <iframe
             className='w-full h-full'
@@ -78,14 +86,14 @@ export const PlaylistViewer: React.FC = () => {
             title={currentVideo.title!}
           />
         ) : (
-          <div className='text-white text-lg'>Select a video to play</div>
+          <div className='text-yt-text-secondary text-lg'>Select a video to play</div>
         )}
       </main>
       {/* Sidebar - Playlist */}
-      <aside className='w-1/4 bg-white border-r overflow-y-auto shadow-lg'>
-        <div className='p-4 border-b flex items-center justify-between'>
+      <aside className='w-1/4 bg-yt-bg m-2 overflow-y-auto shadow-lg border rounded-xl border-yt-border text-yt-text-primary'>
+        <div className='p-4 flex items-center justify-between'>
           <h2 className='text-lg font-bold'>Playlist</h2>
-          <label className='cursor-pointer px-2 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600'>
+          <label className='cursor-pointer px-2 py-1 text-sm bg-yt-accent-red text-yt-text-primary rounded hover:bg-blue-600'>
             Upload JSON
             <input type='file' accept='.json' className='hidden' onChange={handleFileUpload} />
           </label>
