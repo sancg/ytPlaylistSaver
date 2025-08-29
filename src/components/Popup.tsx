@@ -1,4 +1,9 @@
+import { useState } from 'react';
+import { Video } from '../types/video';
+import { GET_PLAYLIST } from '../utils/actions';
+
 export const Popup = () => {
+  const [_playlist, setPlaylist] = useState<Video[] | null>(null);
   const handleGetList = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const currentTab = tabs[0].id;
@@ -7,10 +12,11 @@ export const Popup = () => {
         chrome.tabs.sendMessage(
           currentTab,
           {
-            action: 'SELECT_PLAYLIST',
+            action: GET_PLAYLIST,
           },
-          (r) => {
-            console.log('Playlist Generated: ', r);
+          (response) => {
+            console.log({ file: response });
+            setPlaylist(response);
           }
         );
       }
@@ -19,8 +25,12 @@ export const Popup = () => {
 
   return (
     <div>
-      <button type='button' onClick={handleGetList}>
-        Playlist
+      <button
+        type='button'
+        className='bg-[#e1002d] font-bold hover:bg-red-700 px-3 py-2 rounded w-full'
+        onClick={handleGetList}
+      >
+        Get Playlist
       </button>
     </div>
   );

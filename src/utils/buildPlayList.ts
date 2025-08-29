@@ -1,6 +1,6 @@
-import { Video } from '../types/video';
+import type { Video } from '../types/video';
 
-export const buildPlayList = (ctx: Document) => {
+const buildPlaylist = (ctx: Document) => {
   const playlist = [];
   const locatorPlayList = ctx.querySelectorAll(
     '#secondary-inner .playlist-items  a#wc-endpoint'
@@ -30,7 +30,8 @@ export const buildPlayList = (ctx: Document) => {
     // console.log(video)
     playlist.push(video);
   }
-  console.log(playlist);
-  //   const currentIndex = PLAY_LIST.findIndex((p) => p.currentIndex);
+
   return { playlist };
 };
+
+export { buildPlaylist };

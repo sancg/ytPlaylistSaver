@@ -26,6 +26,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "contentScript.ts"],
+  "include": ["src", "src/content/contentScript.ts"],
   "exclude": ["node_modules", "dist"]
 }
