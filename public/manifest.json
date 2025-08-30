@@ -1,14 +1,14 @@
 {
   "manifest_version": 3,
   "name": "Playlist Saver",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "YouTube Playlist saver in a local file",
   "action": {
     "default_popup": "/html/index.html",
     "default_icon": "logo.png"
   },
   "options_page": "/html/pages/playlist_viewer.html",
-  "permissions": ["activeTab", "scripting", "storage"],
+  "permissions": ["activeTab", "scripting", "storage", "tabGroups"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -20,5 +20,8 @@
       "resources": ["html/pages/playlist_viewer.html", "assets/*"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com;"
+  }
 }

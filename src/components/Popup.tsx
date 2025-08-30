@@ -7,6 +7,11 @@ export const Popup = () => {
   const generatePlaylist = async () => {
     let result = null;
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab.groupId !== -1) {
+      alert('Get playlist from groups');
+    }
+
+    const group_info = await chrome.tabGroups.query({});
     if (tab.id) {
       result = await chrome.tabs.sendMessage(tab.id, {
         action: GET_PLAYLIST,
