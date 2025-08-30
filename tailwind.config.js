@@ -11,7 +11,7 @@ module.exports = {
           },
 
           // Border + divider
-          border: 'rgba(255,255,255,0.1)', // Subtle border (like YouTube's)
+          border: '#616060ab', // Subtle border (like YouTube's)
 
           // Text colors
           text: {
@@ -23,6 +23,7 @@ module.exports = {
           // Accent (YouTube red + blue links)
           accent: {
             red: '#FF0000', // YouTube brand red
+            'hover-red': '#ff4343',
             link: '#3EA6FF', // Links / hover highlights
           },
         },
