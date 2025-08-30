@@ -28,6 +28,7 @@ export default function Player({ video }: PropType) {
   return (
     <>
       <iframe
+        id='youtube-player'
         itemType='text/html'
         key={src}
         className='w-full h-full rounded-xl'
