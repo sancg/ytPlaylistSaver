@@ -1,13 +1,13 @@
 // src/components/PlaylistViewer.tsx
-import '../index.css';
+import '../../index.css';
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import type { Video } from '../types/video';
-import { extractYouTubeID } from '../utils/extraYoutube';
-import Player from './Player';
+import type { Video } from '../../types/video';
+import { extractYouTubeID } from '../../utils/extraYoutube';
+import Player from '../../components/Player';
 import { ArrowUpOnSquareStackIcon } from '@heroicons/react/24/outline';
-import { VideoList } from './VideoList';
+import { VideoList } from '../../components/VideoList';
 
 const STORAGE_KEY = 'playlist';
 
@@ -74,21 +74,28 @@ export const PlaylistViewer: React.FC = () => {
   };
 
   return (
-    <main className='flex h-screen bg-yt-bg w-full p-3 gap-2'>
-      <div className='w-full flex items-center justify-center bg-[#0f0f0f] rounded-xl'>
-        <Player video={currentVideo} />
-      </div>
-      <aside className='bg-yt-bg overflow-y-auto shadow-lg border rounded-xl border-yt-border text-yt-text-primary min-w-2xs'>
-        <div className='flex items-center justify-between p-4 bg-yt-bg-secondary'>
-          <h2 className='text-lg font-bold'>Playlist</h2>
-          <label className='flex min-w-28 px-3 py-2 justify-around place-items-center cursor-pointer font-bold text-sm bg-yt-bg-tertiary rounded-2xl shadow-2xl hover:bg-yt-border'>
-            <ArrowUpOnSquareStackIcon width={20} />
-            Upload
-            <input type='file' accept='.json' className='hidden' onChange={handleFileUpload} />
-          </label>
+    <main className='bg-yt-bg w-full p-3'>
+      <div className='flex flex-col h-(--yt-screen) gap-2 lg:flex-row'>
+        <div className='w-full min-h-[600px] flex items-center justify-center bg-yt-bg rounded-xl border border-yt-bg-secondary'>
+          <Player video={currentVideo} />
         </div>
-        <VideoList selectVideo={playVideo} list={playlist} />
-      </aside>
+        <aside className='min-w-2xs bg-yt-bg overflow-y-auto shadow-lg border rounded-xl border-yt-border text-yt-text-primary '>
+          <div className='flex items-center justify-between p-4 bg-yt-bg-secondary'>
+            <h2 className='text-lg font-bold'>Playlist</h2>
+            <label className='flex min-w-28 px-3 py-2 justify-around place-items-center cursor-pointer font-bold text-sm bg-yt-bg-tertiary rounded-2xl shadow-2xl hover:bg-yt-border'>
+              <ArrowUpOnSquareStackIcon width={20} />
+              Upload
+              <input
+                type='file'
+                accept='.json'
+                className='hidden'
+                onChange={handleFileUpload}
+              />
+            </label>
+          </div>
+          <VideoList selectVideo={playVideo} list={playlist} />
+        </aside>
+      </div>
     </main>
   );
 };

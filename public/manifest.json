@@ -5,13 +5,13 @@
   "description": "YouTube Playlist saver in a local file",
   "action": {
     "default_popup": "/html/index.html",
-    "default_icon": "logo.png"
+    "default_icon": "dw_v3.3.png"
   },
   "options_page": "/html/pages/playlist_viewer.html",
-  "permissions": ["activeTab", "scripting", "storage", "tabGroups"],
+  "permissions": ["tabs", "scripting", "storage", "tabGroups"],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["*://*.youtube.com/*"],
       "js": ["/assets/app/contentScript.js"]
     }
   ],

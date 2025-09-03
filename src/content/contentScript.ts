@@ -7,12 +7,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'get_playlist_from_youtube') {
     const result = buildPlaylist(document);
     if (result.error) {
-      return sendResponse({ error: result.error });
+      sendResponse({ error: result.error, playlist: result.playlist });
+      return;
     }
 
-    console.log({ result });
-    return sendResponse({ playlist: result.playlist });
+    sendResponse({ playlist: result.playlist, error: null });
   }
 
-  return;
+  return { status: 'success' };
 });

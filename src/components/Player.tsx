@@ -31,7 +31,7 @@ export default function Player({ video }: PropType) {
         id='youtube-player'
         itemType='text/html'
         key={src}
-        className='w-full h-full rounded-xl'
+        className='w-full min-h-[600px] h-full rounded-xl'
         src={src}
         allow='accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture'
         allowFullScreen

@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @config "../tailwind.config.js";
 
+@theme {
+  --yt-screen: calc(100dvh - 24px);
+}
 :root {
   font-family: 'Noto Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
 

@@ -1,3 +1,4 @@
-const GET_PLAYLIST = 'get_playlist_from_youtube';
+import getPlaylist from './getPlaylist';
 
-export { GET_PLAYLIST };
+const GET_PLAYLIST = 'get_playlist_from_youtube';
+export { GET_PLAYLIST, getPlaylist };
