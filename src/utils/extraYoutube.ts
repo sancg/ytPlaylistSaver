@@ -15,6 +15,7 @@ export function extractYouTubeID(url: string) {
 
     return match ? match[1] : null;
   } catch (e) {
+    console.error(e);
     // fallback: regex find 11 char id
     const match = url.match(/([A-Za-z0-9_-]{11})/);
     return match ? match[1] : null;

@@ -31,7 +31,7 @@ const buildPlaylist = (ctx: Document) => {
     return obj;
   }
 
-  for (let vid of locatorPlaylist!) {
+  for (const vid of locatorPlaylist!) {
     const video: Video = {};
 
     video.id = new URL(vid.href).searchParams.get('v')!;
@@ -40,7 +40,7 @@ const buildPlaylist = (ctx: Document) => {
     const isImg = vid.querySelector('yt-image > img') as HTMLImageElement;
     video.thumbImg = isImg?.src;
 
-    video.title = vid.querySelector('#meta #video-title')?.ariaLabel!;
+    video.title = vid.querySelector('#meta #video-title')?.ariaLabel ?? '';
 
     video.publishedBy = video.title?.split('게시자:').pop()?.trim();
 
