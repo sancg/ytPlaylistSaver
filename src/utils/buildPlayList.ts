@@ -3,22 +3,35 @@ import type { Video } from '../types/video';
 const buildPlaylist = (ctx: Document) => {
   const playlist: Video[] = [];
 
+  // Check what playlist selector is available
+  // #1 The miniplayer view:
+  const MINI_PLAYER_SELECTOR = 'ytd-miniplayer .playlist-items  a#wc-endpoint';
+  const NORMAL_VIEW_SELECTOR = '#secondary-inner .playlist-items  a#wc-endpoint';
+  const MOBILE_VIEW_SELECTOR = '#primary-inner .playlist-items a#wc-endpoint';
   let locatorPlaylist = ctx.querySelectorAll(
-    '#secondary-inner .playlist-items  a#wc-endpoint'
+    MINI_PLAYER_SELECTOR
   ) as NodeListOf<HTMLAnchorElement> | null;
 
-  if (!locatorPlaylist || locatorPlaylist.length < 1) {
-    console.log('Trying Mobile View Selector');
-    locatorPlaylist = ctx.querySelectorAll('#primary-inner .playlist-items a#wc-endpoint');
+  const isLocator = locatorPlaylist && [...locatorPlaylist]?.length >= 1;
+  console.log({ isLocator });
+
+  if (!isLocator) {
+    console.log('Getting the Playlist from: Normal View Selector');
+    locatorPlaylist = ctx.querySelectorAll(NORMAL_VIEW_SELECTOR);
   }
 
-  if (!locatorPlaylist || locatorPlaylist.length < 1) {
+  if (!isLocator) {
+    console.log('Getting the Playlist from: Mobile View Selector');
+    locatorPlaylist = ctx.querySelectorAll(MOBILE_VIEW_SELECTOR);
+  }
+
+  if (!isLocator) {
     const obj = { error: 'general Playlist locator not found', playlist };
     console.error(obj);
     return obj;
   }
 
-  for (let vid of locatorPlaylist) {
+  for (const vid of locatorPlaylist!) {
     const video: Video = {};
 
     video.id = new URL(vid.href).searchParams.get('v')!;
@@ -27,7 +40,7 @@ const buildPlaylist = (ctx: Document) => {
     const isImg = vid.querySelector('yt-image > img') as HTMLImageElement;
     video.thumbImg = isImg?.src;
 
-    video.title = vid.querySelector('#meta #video-title')?.ariaLabel!;
+    video.title = vid.querySelector('#meta #video-title')?.ariaLabel ?? '';
 
     video.publishedBy = video.title?.split('게시자:').pop()?.trim();
 

@@ -5,13 +5,13 @@ module.exports = {
         yt: {
           // Background layers
           bg: {
-            DEFAULT: '#181818', // Main background
-            secondary: '#212121', // Slightly lighter panels/cards
-            tertiary: '#383838', // Hover / active states
+            DEFAULT: '#151518', //'#181818', // Main background
+            secondary: '#231f28', //'#212121', // Slightly lighter panels/cards
+            tertiary: '#272727', // Hover / active states
           },
 
           // Border + divider
-          border: '#616060ab', // Subtle border (like YouTube's)
+          border: '#3f3f3f', // Subtle border (like YouTube's)
 
           // Text colors
           text: {

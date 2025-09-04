@@ -1,3 +1,5 @@
-const GET_PLAYLIST = 'get_playlist_from_youtube';
+import getPlaylist from './getPlaylist';
+import manageExtensionTab from './manageExtensionTabs';
 
-export { GET_PLAYLIST };
+const GET_PLAYLIST = 'get_playlist_from_youtube';
+export { GET_PLAYLIST, getPlaylist, manageExtensionTab };

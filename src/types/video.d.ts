@@ -8,4 +8,9 @@ type Video = {
   currentIndex?: boolean;
 };
 
-export { Video };
+export type GetPlaylistCall = {
+  playlist: Video[];
+  error: string | null;
+};
+
+export { Video, GetPlaylistCall };

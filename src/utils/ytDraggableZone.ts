@@ -1,3 +1,4 @@
+//@ts-nocheck
 // ✅ Remove existing draggable zones if any
 document.querySelectorAll('#ext_draggable-zone')?.forEach((zone) => zone.remove());
 
