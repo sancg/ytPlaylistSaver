@@ -93,7 +93,7 @@ export const PlaylistViewer: React.FC = () => {
               />
             </label>
           </div>
-          <VideoList selectVideo={playVideo} list={playlist} />
+          <VideoList selectVideo={playVideo} currentVideo={currentVideo} list={playlist} />
         </aside>
       </div>
     </main>

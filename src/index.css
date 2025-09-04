@@ -3,6 +3,7 @@
 
 @theme {
   --yt-screen: calc(100dvh - 24px);
+  --yt-active: rgba(51, 36, 23, 0.949);
 }
 :root {
   font-family: 'Noto Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;

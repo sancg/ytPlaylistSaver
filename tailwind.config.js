@@ -5,8 +5,8 @@ module.exports = {
         yt: {
           // Background layers
           bg: {
-            DEFAULT: '#181818', // Main background
-            secondary: '#212121', // Slightly lighter panels/cards
+            DEFAULT: '#151518', //'#181818', // Main background
+            secondary: '#231f28', //'#212121', // Slightly lighter panels/cards
             tertiary: '#272727', // Hover / active states
           },
 
