@@ -1,12 +1,7 @@
 import './App.css';
-import { getPlaylist } from './utils/actions';
+import { getPlaylist, manageExtensionTab } from './utils/actions';
 import { ArrowPathIcon, CloudArrowDownIcon } from '@heroicons/react/20/solid';
 import type { GetPlaylistCall, Video } from './types/video';
-
-const openViewer = () => {
-  const url = chrome.runtime.getURL('html/pages/playlist_viewer.html');
-  chrome.tabs.create({ url });
-};
 
 const refreshExtension = () => {
   chrome.runtime.reload();
@@ -14,6 +9,13 @@ const refreshExtension = () => {
 };
 
 function App() {
+  const openViewer = async () => {
+    const { id } = await chrome.windows.getCurrent();
+
+    const url = chrome.runtime.getURL('html/pages/playlist_viewer.html');
+    await manageExtensionTab(url, id!);
+  };
+
   const handleGetPlaylist = async () => {
     const { playlist, error }: GetPlaylistCall = await getPlaylist();
     if (error) {
@@ -66,7 +68,8 @@ function App() {
             Manage playlists, upload JSON, and play inside a YouTube-like page.
           </p>
           <button
-            className='bg-[#e1002d] font-bold hover:bg-red-700 px-3 py-2 rounded-2xl w-full'
+            //bg-[#e1002d]
+            className='bg-yt-accent-red font-bold hover:cursor-pointer hover:bg-red-700 px-3 py-2 rounded-2xl w-full'
             onClick={openViewer}
           >
             Open Playlist Viewer
