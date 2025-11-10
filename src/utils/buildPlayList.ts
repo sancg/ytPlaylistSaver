@@ -5,8 +5,9 @@ type LocatorMap = Record<
   NodeListOf<HTMLAnchorElement> | null
 >;
 
-const buildPlaylist = (ctx: Document) => {
+const buildPlaylist = async (ctx: Document) => {
   const playlist: Video[] = [];
+  let skipVideo = 0;
 
   // Check what playlist selector is available
   const MINI_PLAYER_SELECTOR = 'ytd-miniplayer .playlist-items  a#wc-endpoint';
@@ -32,18 +33,41 @@ const buildPlaylist = (ctx: Document) => {
 
   console.log({ isLocator, total: validLocator.length });
   //TODO: Load all Images before getting the Playlist (It needs scroll through the list).
+  const videoItem = validLocator[0];
+  const heighToScroll = videoItem.clientHeight;
+  const containerToScroll = videoItem.parentElement?.parentElement;
+  const originalPos = containerToScroll?.scrollTop;
+
+  // 1) Ensure we read from the top
+  containerToScroll?.scrollTo(0, 0);
+  console.log('scroll to top');
+  // 2) Load All Images content
+  await sleep(1000);
+  validLocator.forEach(async (_item) => {
+    containerToScroll?.scrollBy(0, heighToScroll);
+    await sleep(2500);
+  });
+  await sleep(1000);
+  // 3) Return to original position
+  containerToScroll?.scrollTo(0, originalPos || 0);
+
   for (const vid of validLocator) {
     const video: Video = {};
 
     video.id = new URL(vid.href).searchParams.get('v')!;
     video.url = vid.href;
+    if (!video.id) {
+      skipVideo++;
+      console.warn('Video URL and ID was not detected for: ', vid);
+      continue;
+    }
 
     const isImg = vid.querySelector('yt-image > img') as HTMLImageElement;
     video.thumbImg = isImg?.src;
 
     video.title = vid.querySelector('#meta #video-title')?.ariaLabel ?? '';
 
-    video.publishedBy = video.title?.split('게시자:').pop()?.trim();
+    video.publishedBy = vid.querySelector('#byline-container > span')?.textContent ?? '';
 
     vid.querySelector('#index')?.textContent == '▶' ? (video.currentIndex = true) : false;
 
@@ -54,7 +78,12 @@ const buildPlaylist = (ctx: Document) => {
     playlist.push(video);
   }
 
+  console.log({ skipped: skipVideo, total: validLocator.length });
   return { error: null, playlist };
 };
+
+function sleep(timeout: number) {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+}
 
 export { buildPlaylist };

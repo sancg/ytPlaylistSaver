@@ -17,7 +17,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["html/pages/playlist_viewer.html", "assets/*"],
+      "resources": ["assets/iframe_api.js", "html/pages/playlist_viewer.html", "assets/*"],
       "matches": ["<all_urls>"]
     }
   ],

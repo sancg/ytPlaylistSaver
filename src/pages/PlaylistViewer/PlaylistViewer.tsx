@@ -1,13 +1,12 @@
-// src/components/PlaylistViewer.tsx
 import '../../index.css';
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import type { Video } from '../../types/video';
-import { extractYouTubeID } from '../../utils/extraYoutube';
 import Player from '../../components/Player';
-import { ArrowUpOnSquareStackIcon } from '@heroicons/react/24/outline';
 import { VideoList } from '../../components/VideoList';
+import { extractYouTubeID } from '../../utils/extraYoutube';
+import { ArrowUpOnSquareStackIcon } from '@heroicons/react/24/outline';
+import type { Video } from '../../types/video';
 
 const STORAGE_KEY = 'playlist';
 
@@ -32,15 +31,14 @@ export const PlaylistViewer: React.FC = () => {
 
   const normalizePlaylist = (obj: {
     playlist?: Video[];
-    playList?: Video[];
+    // playList?: Video[]; // legacy - I returned an object with this name
   }): Video[] | null => {
-    // pick the first non-null key
-    const list = obj.playlist ?? obj.playList;
+    const list = obj.playlist;
     if (!Array.isArray(list)) return null;
 
     return list.map((v) => ({
       ...v,
-      id: v.id ?? extractYouTubeID(v.url ?? '') ?? undefined,
+      id: v.id ?? extractYouTubeID(v.url || ''),
     }));
   };
 
@@ -54,6 +52,7 @@ export const PlaylistViewer: React.FC = () => {
       try {
         const parseObject = JSON.parse(e.target?.result as string);
         const uploadedPlaylist = normalizePlaylist(parseObject);
+        console.log({ uploadedPlaylist });
 
         if (!uploadedPlaylist) {
           console.error('Invalid JSON format. Expected an array of videos.');
@@ -79,9 +78,12 @@ export const PlaylistViewer: React.FC = () => {
         <div className='w-full min-h-[600px] flex items-center justify-center bg-yt-bg rounded-xl border border-yt-bg-secondary'>
           <Player video={currentVideo} />
         </div>
-        <aside className='min-w-2xs bg-yt-bg overflow-y-auto shadow-lg border rounded-xl border-yt-border text-yt-text-primary '>
-          <div className='flex items-center justify-between p-4 bg-yt-bg-secondary'>
-            <h2 className='text-lg font-bold'>Playlist</h2>
+        <aside className='relative min-w-3xs bg-yt-bg overflow-y-auto shadow-lg border rounded-xl border-yt-border text-yt-text-primary '>
+          <div className='static flex items-center justify-between p-4 bg-yt-bg-secondary w-full'>
+            <div className='flex flex-col'>
+              <h2 className='text-lg font-bold'>Playlist</h2>
+              {currentVideo ? <span>1/2</span> : ''}
+            </div>
             <label className='flex min-w-28 px-3 py-2 justify-around place-items-center cursor-pointer font-bold text-sm bg-yt-bg-tertiary rounded-2xl shadow-2xl hover:bg-yt-border'>
               <ArrowUpOnSquareStackIcon width={20} />
               Upload
@@ -93,6 +95,7 @@ export const PlaylistViewer: React.FC = () => {
               />
             </label>
           </div>
+          {/* TODO: When selecting a video the list should snap to top if surpass 60% of the height VideoList*/}
           <VideoList selectVideo={playVideo} currentVideo={currentVideo} list={playlist} />
         </aside>
       </div>
