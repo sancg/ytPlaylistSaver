@@ -5,7 +5,7 @@ type LocatorMap = Record<
   NodeListOf<HTMLAnchorElement> | null
 >;
 
-const buildPlaylist = async (ctx: Document) => {
+async function buildContentPlaylist(ctx: Document) {
   const playlist: Video[] = [];
   let skipVideo = 0;
 
@@ -31,28 +31,12 @@ const buildPlaylist = async (ctx: Document) => {
     return obj;
   }
 
-  console.log({ isLocator, total: validLocator.length });
-  //TODO: Load all Images before getting the Playlist (It needs scroll through the list).
-  const videoItem = validLocator[0];
-  const heighToScroll = videoItem.clientHeight;
-  const containerToScroll = videoItem.parentElement?.parentElement;
-  const originalPos = containerToScroll?.scrollTop;
-
-  // 1) Ensure we read from the top
-  containerToScroll?.scrollTo(0, 0);
-  console.log('scroll to top');
-  // 2) Load All Images content
-  await sleep(1000);
-  validLocator.forEach(async (_item) => {
-    containerToScroll?.scrollBy(0, heighToScroll);
-    await sleep(2500);
-  });
-  await sleep(1000);
-  // 3) Return to original position
-  containerToScroll?.scrollTo(0, originalPos || 0);
+  const totalVideos = validLocator.length;
+  console.log({ isLocator, total: totalVideos });
+  await loadPLaylistImages(validLocator);
 
   for (const vid of validLocator) {
-    const video: Video = {};
+    const video: Video = { id: '', title: '', url: '', thumbImg: '' };
 
     video.id = new URL(vid.href).searchParams.get('v')!;
     video.url = vid.href;
@@ -78,12 +62,32 @@ const buildPlaylist = async (ctx: Document) => {
     playlist.push(video);
   }
 
-  console.log({ skipped: skipVideo, total: validLocator.length });
-  return { error: null, playlist };
-};
-
-function sleep(timeout: number) {
-  return new Promise((resolve) => setTimeout(resolve, timeout));
+  console.log({ skipped: skipVideo, total: totalVideos, p: playlist });
+  return { playlist, error: null };
 }
 
-export { buildPlaylist };
+async function loadPLaylistImages(videos: NodeListOf<HTMLElement>) {
+  const videoItem = videos[0];
+  const heighToScroll = videoItem.clientHeight;
+  const containerToScroll = videoItem.parentElement?.parentElement;
+  const originalPos = containerToScroll?.scrollTop;
+
+  // 1) Ensure we read from the top
+  console.log('scrolling to top...');
+  containerToScroll?.scrollTo(0, 0);
+  // 2) Load All Images content
+  console.log('scrolling elements...');
+  containerToScroll?.scrollBy({
+    behavior: 'smooth',
+    top: heighToScroll * videos.length,
+  });
+  await sleep(1500);
+  // 3) Return to original position
+  console.log('scrolling back to original position');
+  containerToScroll?.scrollTo(0, originalPos || 0);
+}
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export { buildContentPlaylist };

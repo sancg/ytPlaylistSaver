@@ -1,17 +1,31 @@
-import { GET_PLAYLIST } from '.';
+import { GET_PLAYLIST, sendMessageTab } from '.';
 import type { GetPlaylistCall } from '../../types/video';
 
-const getPlaylist = async (): Promise<GetPlaylistCall> => {
+async function getPlaylist(): Promise<GetPlaylistCall> {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   if (tab.id) {
-    const result = await chrome.tabs.sendMessage(tab.id, {
+    const { playlist, error } = await sendMessageTab<GetPlaylistCall>(tab.id, {
       action: GET_PLAYLIST,
     });
-    return result;
+
+    // Detect if we loaded all images if not return fail
+    if (!error) {
+      const shouldHaveValues = playlist.filter(
+        (vid) => !vid.id || !vid.title || !vid.thumbImg || !vid.url
+      );
+      if (shouldHaveValues.length > 0) {
+        return {
+          playlist: shouldHaveValues,
+          error: 'Missing key information on this playlist',
+        };
+      }
+    }
+
+    return { playlist, error };
   }
 
-  return { error: 'No response was received', playlist: [] };
-};
+  return { playlist: [], error: 'No response was received' };
+}
 
 export default getPlaylist;

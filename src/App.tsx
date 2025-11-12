@@ -17,13 +17,8 @@ function App() {
   };
 
   const handleGetPlaylist = async () => {
-    const result = await getPlaylist();
-    // WARNING: The Async/Await introduce in getPlaylist() broke the code, now I cannot access the JSOn downloader.
-    if (result.error) {
-      console.error(result.error);
-      return;
-    }
-    const playlist = result.playlist;
+    const { playlist, error } = await getPlaylist();
+    console.log({ back: { playlist, error } });
 
     if (playlist) {
       const currentIndex = playlist.findIndex((p: Video) => p.currentIndex);

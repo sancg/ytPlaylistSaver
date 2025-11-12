@@ -11,7 +11,7 @@ import type { Video } from '../types/video';
   }
 
   for (let vid of locatorPlayList) {
-    const video: Video = {};
+    const video: Video = { id: '', title: '', thumbImg: '', url: '' };
 
     video.id = new URL(vid.href).searchParams.get('v')!;
     video.url = vid.href;

@@ -1,17 +1,16 @@
-import { buildPlaylist } from '../utils/buildPlayList';
+import { buildContentPlaylist } from '../utils/buildPlayList';
 console.log('Content script loaded');
 
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  console.log({ request, sender });
-
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   if (request.action === 'get_playlist_from_youtube') {
-    const result = await buildPlaylist(document);
-    if (result.error) {
-      sendResponse({ error: result.error, playlist: result.playlist });
-      return;
-    }
+    (async () => {
+      const { playlist, error } = await buildContentPlaylist(document);
+      console.log('Playlist extraction complete...');
+      sendResponse({ playlist, error });
+    })();
 
-    sendResponse({ playlist: result.playlist, error: null });
+    // return true keeps the message port open for async sendResponse()
+    return true;
   }
 
   return { status: 'success' };
