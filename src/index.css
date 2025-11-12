@@ -2,7 +2,7 @@
 @config "../tailwind.config.js";
 
 @theme {
-  --yt-screen: calc(100dvh - 24px);
+  --yt-screen: calc(100dvh - 30px);
   --yt-active: rgba(51, 36, 23, 0.949);
 }
 :root {

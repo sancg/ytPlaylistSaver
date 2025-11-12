@@ -1,7 +1,7 @@
 import './App.css';
 import { getPlaylist, manageExtensionTab } from './utils/actions';
 import { ArrowPathIcon, CloudArrowDownIcon } from '@heroicons/react/20/solid';
-import type { GetPlaylistCall, Video } from './types/video';
+import type { Video } from './types/video';
 
 const refreshExtension = () => {
   chrome.runtime.reload();
@@ -17,11 +17,8 @@ function App() {
   };
 
   const handleGetPlaylist = async () => {
-    const { playlist, error }: GetPlaylistCall = await getPlaylist();
-    if (error) {
-      console.error(error);
-      return;
-    }
+    const { playlist, error } = await getPlaylist();
+    console.log({ back: { playlist, error } });
 
     if (playlist) {
       const currentIndex = playlist.findIndex((p: Video) => p.currentIndex);

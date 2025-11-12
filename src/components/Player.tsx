@@ -15,6 +15,8 @@ export default function Player({ video }: PropType) {
     );
   }
 
+  const strVideo = video.title?.split(' ').slice(0, -2).join(' ');
+
   const src = useMemo(() => {
     if (!video.id) return '';
     return buildYouTubeEmbedSrc(video.id, {
@@ -28,14 +30,14 @@ export default function Player({ video }: PropType) {
   return (
     <>
       <iframe
-        id='youtube-player'
-        itemType='text/html'
+        id='widget2'
         key={src}
-        className='w-full min-h-[600px] h-full rounded-xl'
+        className='w-full h-full rounded-xl'
         src={src}
-        allow='accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture'
-        allowFullScreen
-        title={video.title}
+        allow='accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share'
+        allowFullScreen={true}
+        title={strVideo}
+        referrerPolicy='unsafe-url'
       />
     </>
   );

@@ -14,12 +14,12 @@ export function buildYouTubeEmbedSrc(
     : `https://www.youtube.com/embed/${videoId}`;
 
   const params = new URLSearchParams({
-    enablejsapi: '1',
-    origin: `chrome-extension://${chrome.runtime.id}`,
+    autoplay: autoplay ? '1' : '0',
     playsinline: '1',
     rel: String(rel),
     modestbranding: modestBranding ? '1' : '0',
-    autoplay: autoplay ? '1' : '0',
+    enablejsapi: '1',
+    origin: `chrome-extension://${chrome.runtime.id}`,
   });
 
   return `${base}?${params.toString()}`;
