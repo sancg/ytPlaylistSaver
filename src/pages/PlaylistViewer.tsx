@@ -1,12 +1,12 @@
-import '../../index.css';
+import '../styles/global.css';
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import Player from '../../components/Player';
-import { VideoList } from '../../components/VideoList';
-import { extractYouTubeID } from '../../utils/extraYoutube';
+import Player from '../components/Player';
+import { VideoList } from '../components/VideoList';
+import { extractYouTubeID } from '../utils/extraYoutube';
 import { ArrowUpOnSquareStackIcon } from '@heroicons/react/24/outline';
-import type { Video } from '../../types/video';
+import type { Video } from '../types/video';
 
 const STORAGE_KEY = 'playlist';
 

@@ -1,5 +1,5 @@
-import './App.css';
-import { getPlaylist, manageExtensionTab } from './utils/actions';
+import './styles/app.css';
+import { focusExtensionTab, getPlaylist } from './utils/actions';
 import { ArrowPathIcon, CloudArrowDownIcon } from '@heroicons/react/20/solid';
 import type { Video } from './types/video';
 
@@ -13,7 +13,7 @@ function App() {
     const { id } = await chrome.windows.getCurrent();
 
     const url = chrome.runtime.getURL('html/pages/playlist_viewer.html');
-    await manageExtensionTab(url, id!);
+    await focusExtensionTab(url, id!);
   };
 
   const handleGetPlaylist = async () => {

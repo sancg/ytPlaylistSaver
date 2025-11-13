@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "description": "YouTube Playlist saver in a local file",
   "action": {
-    "default_popup": "/html/index.html",
-    "default_icon": "dw_v3.3.png"
+    "default_popup": "public/html/index.html",
+    "default_icon": "assets/icons/dw_v3.3.png"
   },
-  "options_page": "/html/pages/playlist_viewer.html",
+  "options_page": "public/html/pages/playlist_viewer.html",
   "permissions": ["tabs", "scripting", "storage", "tabGroups"],
   "content_scripts": [
     {
@@ -17,7 +17,11 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["assets/iframe_api.js", "html/pages/playlist_viewer.html", "assets/*"],
+      "resources": [
+        "assets/iframe_api.js",
+        "public/html/pages/playlist_viewer.html",
+        "assets/*"
+      ],
       "matches": ["<all_urls>"]
     }
   ],

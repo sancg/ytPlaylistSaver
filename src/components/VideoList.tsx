@@ -28,7 +28,7 @@ export const VideoList = ({ list, currentVideo, selectVideo }: PropTypes) => {
               currentVideo?.id === video.id ? 'bg-(--yt-active)' : ''
             } hover:bg-yt-bg-tertiary cursor-pointer`}
           >
-            <div className='flex items-center' onClick={() => selectVideo(video)}>
+            <div className='flex flex-1 items-center' onClick={() => selectVideo(video)}>
               {renderIndex(video.id!)}
               <a hidden href={video.url!} />
               <img

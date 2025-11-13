@@ -1,7 +1,4 @@
-export default async function manageExtensionTab(
-  extensionUrl: string,
-  currentWindowId: number
-) {
+async function focusExtensionTab(extensionUrl: string, currentWindowId: number) {
   // Find if a tab with your extension's page is already open
   const [tab] = await chrome.tabs.query({ url: extensionUrl });
 
@@ -28,3 +25,5 @@ export default async function manageExtensionTab(
   // Otherwise, open a new tab with the extension page
   return await chrome.tabs.create({ url: extensionUrl });
 }
+
+export { focusExtensionTab };

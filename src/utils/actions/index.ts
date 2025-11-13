@@ -1,6 +1,6 @@
 import getPlaylist from './getPlaylist';
-import manageExtensionTab from './manageExtensionTabs';
+import { focusExtensionTab } from './focusExtensionTab';
 import { sendMessageTab } from './sendMessageTab';
 
 const GET_PLAYLIST = 'get_playlist_from_youtube';
-export { GET_PLAYLIST, getPlaylist, manageExtensionTab, sendMessageTab };
+export { GET_PLAYLIST, getPlaylist, focusExtensionTab, sendMessageTab };

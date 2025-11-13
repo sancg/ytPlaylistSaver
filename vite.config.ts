@@ -9,9 +9,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        index: resolve(__dirname, 'html/index.html'),
-        contentScript: resolve(__dirname, 'src/content/contentScript.ts'),
-        viewer: resolve(__dirname, 'html/pages/playlist_viewer.html'),
+        index: resolve(__dirname, 'public/html/index.html'),
+        contentScript: resolve(__dirname, 'src/scripts/contentScript.ts'),
+        viewer: resolve(__dirname, 'public/html/pages/playlist_viewer.html'),
       },
       output: {
         entryFileNames: 'assets/app/[name].js',
