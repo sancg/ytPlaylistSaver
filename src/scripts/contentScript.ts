@@ -12,5 +12,9 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     return true;
   }
 
+  if (request.action === 'add_video') {
+    const btn = document.querySelector<HTMLButtonElement>('#ytps-fav-btn');
+    btn?.click();
+  }
   return { status: 'success' };
 });

@@ -9,9 +9,11 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        index: resolve(__dirname, 'public/html/index.html'),
+        index: 'public/html/index.html',
         contentScript: resolve(__dirname, 'src/scripts/contentScript.ts'),
-        viewer: resolve(__dirname, 'public/html/pages/playlist_viewer.html'),
+        injectFavButton: resolve(__dirname, 'src/scripts/injectFavButton.js'),
+        viewer: 'public/html/pages/playlist_viewer.html',
+        sidePanel: 'public/html/pages/sp_manager.html',
       },
       output: {
         entryFileNames: 'assets/app/[name].js',

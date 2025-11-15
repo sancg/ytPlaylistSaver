@@ -2,6 +2,7 @@ import './styles/app.css';
 import { focusExtensionTab, getPlaylistTab } from './utils/actions';
 import { ArrowPathIcon, CloudArrowDownIcon } from '@heroicons/react/20/solid';
 import type { Video } from './types/video';
+import { Popup } from './pages/Popup';
 
 const refreshExtension = () => {
   chrome.runtime.reload();
@@ -59,6 +60,7 @@ function App() {
                   className='transition-all duration-300 ease-in-out hover:scale-125 hover:cursor-pointer'
                 />
               </div>
+              <Popup />
             </div>
           </div>
           <p className='my-2 text-sm text-yt-text-secondary'>

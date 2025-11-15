@@ -1,18 +1,27 @@
 {
   "manifest_version": 3,
   "name": "Playlist Saver",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "YouTube Playlist saver in a local file",
   "action": {
     "default_popup": "public/html/index.html",
     "default_icon": "assets/icons/dw_v3.3.png"
   },
+  "side_panel": {
+    "default_path": "public/html/pages/sp_manager.html",
+    "default_icon": "assets/icons/dw_v3.3.png"
+  },
   "options_page": "public/html/pages/playlist_viewer.html",
-  "permissions": ["tabs", "scripting", "storage", "tabGroups"],
+  "permissions": ["tabs", "scripting", "storage", "tabGroups", "sidePanel"],
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
       "js": ["/assets/app/contentScript.js"]
+    },
+    {
+      "matches": ["*://*.youtube.com/watch*"],
+      "js": ["/assets/app/injectFavButton.js"],
+      "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
