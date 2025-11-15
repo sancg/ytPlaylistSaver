@@ -9,15 +9,31 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        index: 'public/html/index.html',
-        contentScript: resolve(__dirname, 'src/scripts/contentScript.ts'),
-        injectFavButton: resolve(__dirname, 'src/scripts/injectFavButton.js'),
+        index: 'src/pages/popup/popup.html',
         viewer: 'public/html/pages/playlist_viewer.html',
-        sidePanel: 'public/html/pages/sp_manager.html',
+        sidePanel: 'src/pages/side_panel/side-panel.html',
+        contentScript: resolve(__dirname, 'src/scripts/content/contentScript.ts'),
+        contentFavButton: resolve(__dirname, 'src/scripts/content/contentFavButton.ts'),
+        background: resolve(__dirname, 'src/scripts/background/background.ts'),
       },
       output: {
-        entryFileNames: 'assets/app/[name].js',
-        chunkFileNames: 'assets/app/[name]-[hash].js',
+        entryFileNames: (chunkInfo) => {
+          const name = chunkInfo.name;
+          const basePath = 'assets/app/scripts';
+
+          // Background folder
+          if (name === 'background') {
+            return `${basePath}/background/${name}.js`;
+          }
+
+          // Content scripts folder
+          if (name === 'contentScript' || name === 'contentFavButton') {
+            return `${basePath}/content/${name}.js`;
+          }
+
+          return `assets/app/other/${name}.js`;
+        },
+        chunkFileNames: 'assets/app/bundler/[name]-[hash].js',
         assetFileNames: 'assets/[name].[ext]',
       },
     },

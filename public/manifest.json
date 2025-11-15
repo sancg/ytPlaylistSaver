@@ -4,32 +4,36 @@
   "version": "1.1.0",
   "description": "YouTube Playlist saver in a local file",
   "action": {
-    "default_popup": "public/html/index.html",
+    "default_popup": "src/pages/popup/popup.html",
     "default_icon": "assets/icons/dw_v3.3.png"
   },
   "side_panel": {
-    "default_path": "public/html/pages/sp_manager.html",
+    "default_path": "src/pages/side_panel/side-panel.html",
     "default_icon": "assets/icons/dw_v3.3.png"
   },
   "options_page": "public/html/pages/playlist_viewer.html",
-  "permissions": ["tabs", "scripting", "storage", "tabGroups", "sidePanel"],
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
-      "js": ["/assets/app/contentScript.js"]
+      "js": ["/assets/app/scripts/content/contentScript.js"]
     },
     {
       "matches": ["*://*.youtube.com/watch*"],
-      "js": ["/assets/app/injectFavButton.js"],
+      "js": ["/assets/app/scripts/content/contentFavButton.js"],
       "run_at": "document_idle"
     }
   ],
+  "background": {
+    "service_worker": "/assets/app/scripts/background/background.js",
+    "type": "module"
+  },
   "web_accessible_resources": [
     {
       "resources": ["public/html/pages/playlist_viewer.html", "assets/*"],
       "matches": ["<all_urls>"]
     }
   ],
+  "permissions": ["tabs", "scripting", "storage", "tabGroups", "sidePanel"],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com;"
   }

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { buildYouTubeEmbedSrc } from '../utils/yt_api/embed';
+import { buildYouTubeEmbedSrc } from '../scripts/content/yt_api/embed';
 // import { loadYouTubeIframeAPI } from '../utils/yt_api/load_yt_iframe';
 import type { Video } from '../types/video';
 

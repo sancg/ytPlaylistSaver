@@ -2,7 +2,7 @@ import './styles/app.css';
 import { focusExtensionTab, getPlaylistTab } from './utils/actions';
 import { ArrowPathIcon, CloudArrowDownIcon } from '@heroicons/react/20/solid';
 import type { Video } from './types/video';
-import { Popup } from './pages/Popup';
+import { Popup } from './pages/popup/Popup';
 
 const refreshExtension = () => {
   chrome.runtime.reload();

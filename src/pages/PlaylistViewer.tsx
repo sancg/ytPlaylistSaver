@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 
 import Player from '../components/Player';
 import { VideoList } from '../components/VideoList';
-import { extractYouTubeID } from '../utils/extraYoutube';
+import { extractYouTubeID } from '../scripts/content/yt_api/extraYoutube';
 import { ArrowUpOnSquareStackIcon } from '@heroicons/react/24/outline';
 import type { Video } from '../types/video';
 
