@@ -1,5 +1,5 @@
 import './styles/app.css';
-import { focusExtensionTab, getPlaylist } from './utils/actions';
+import { focusExtensionTab, getPlaylistTab } from './utils/actions';
 import { ArrowPathIcon, CloudArrowDownIcon } from '@heroicons/react/20/solid';
 import type { Video } from './types/video';
 
@@ -12,13 +12,13 @@ function App() {
   const openViewer = async () => {
     const { id } = await chrome.windows.getCurrent();
 
-    const url = chrome.runtime.getURL('html/pages/playlist_viewer.html');
+    const url = chrome.runtime.getURL('public/html/pages/playlist_viewer.html');
     await focusExtensionTab(url, id!);
   };
 
   const handleGetPlaylist = async () => {
-    const { playlist, error } = await getPlaylist();
-    console.log({ back: { playlist, error } });
+    const { playlist, error } = await getPlaylistTab();
+    console.log({ ext_log: { playlist, error } });
 
     if (playlist) {
       const currentIndex = playlist.findIndex((p: Video) => p.currentIndex);

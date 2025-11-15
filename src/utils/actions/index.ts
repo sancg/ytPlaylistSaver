@@ -1,6 +1,6 @@
-import getPlaylist from './getPlaylist';
+import { ct } from './constants';
+import getPlaylistTab from './getPlaylistTab';
 import { focusExtensionTab } from './focusExtensionTab';
 import { sendMessageTab } from './sendMessageTab';
 
-const GET_PLAYLIST = 'get_playlist_from_youtube';
-export { GET_PLAYLIST, getPlaylist, focusExtensionTab, sendMessageTab };
+export { ct, getPlaylistTab, focusExtensionTab, sendMessageTab };

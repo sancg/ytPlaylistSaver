@@ -7,7 +7,7 @@ type LocatorMap = Record<
 
 async function buildContentPlaylist(ctx: Document) {
   const playlist: Video[] = [];
-  let skipVideo = 0;
+  const skipVideos: { video: Video; errMsg: string }[] = [];
 
   // Check what playlist selector is available
   const MINI_PLAYER_SELECTOR = 'ytd-miniplayer .playlist-items  a#wc-endpoint';
@@ -26,35 +26,38 @@ async function buildContentPlaylist(ctx: Document) {
   const isLocator = validLocator && [...validLocator]?.length >= 1;
 
   if (!isLocator) {
-    const obj = { error: 'general Playlist locator not found', playlist };
-    console.error(obj);
+    const obj = { error: 'Playlist locator not found', playlist };
+    console.error(obj.error);
     return obj;
   }
 
-  const totalVideos = validLocator.length;
-  console.log({ isLocator, total: totalVideos });
   await loadPLaylistImages(validLocator);
 
   for (const vid of validLocator) {
     const video: Video = { id: '', title: '', url: '', thumbImg: '' };
 
     video.id = new URL(vid.href).searchParams.get('v')!;
+    video.title = vid.querySelector('#meta #video-title')?.ariaLabel ?? '';
     video.url = vid.href;
-    if (!video.id) {
-      skipVideo++;
-      console.warn('Video URL and ID was not detected for: ', vid);
-      continue;
-    }
 
     const isImg = vid.querySelector('yt-image > img') as HTMLImageElement;
     video.thumbImg = isImg?.src;
 
-    video.title = vid.querySelector('#meta #video-title')?.ariaLabel ?? '';
+    if (!video.id) {
+      console.warn('Video ID is missing for video: ', video);
+      skipVideos.push({ video, errMsg: 'video ID not found' });
+      continue;
+    }
 
-    video.publishedBy = vid.querySelector('#byline-container > span')?.textContent ?? '';
+    if (!video.thumbImg) {
+      console.warn('Video Thumbnail is missing for video: ', video);
+      skipVideos.push({ video, errMsg: 'video thumbnail not found' });
+      continue;
+    }
 
+    video.publishedBy =
+      vid.querySelector('#byline-container > span')?.textContent?.trim() ?? '';
     vid.querySelector('#index')?.textContent == '▶' ? (video.currentIndex = true) : false;
-
     video.timeLength = vid
       .querySelector('#thumbnail-container #time-status #text')
       ?.textContent?.trim();
@@ -62,32 +65,49 @@ async function buildContentPlaylist(ctx: Document) {
     playlist.push(video);
   }
 
-  console.log({ skipped: skipVideo, total: totalVideos, p: playlist });
-  return { playlist, error: null };
+  // General Error Message if we skip videos
+  if (skipVideos.length > 0) {
+    return {
+      playlist,
+      skipVideos,
+      error: 'Missing key information on this playlist',
+    };
+  }
+
+  console.log({ skipped: skipVideos.length, total: validLocator.length, p: playlist });
+  return { playlist, skipVideos: null, error: null };
 }
 
 async function loadPLaylistImages(videos: NodeListOf<HTMLElement>) {
   const videoItem = videos[0];
-  const heighToScroll = videoItem.clientHeight;
+  const heighToScroll = videoItem.clientHeight * videos.length;
   const containerToScroll = videoItem.parentElement?.parentElement;
   const originalPos = containerToScroll?.scrollTop;
 
-  // 1) Ensure we read from the top
-  console.log('scrolling to top...');
-  containerToScroll?.scrollTo(0, 0);
-  // 2) Load All Images content
-  console.log('scrolling elements...');
-  containerToScroll?.scrollBy({
+  if (!containerToScroll) {
+    return;
+  }
+
+  // Detect viewport scrolling related to the Items height
+  if (containerToScroll.clientHeight >= heighToScroll) {
+    return;
+  }
+
+  // 1) Ensure we scroll from the top
+  containerToScroll.scrollTo(0, 0);
+  // 2) Load all images content
+  containerToScroll.scrollBy({
     behavior: 'smooth',
-    top: heighToScroll * videos.length,
+    top: heighToScroll,
   });
   await sleep(1500);
+
   // 3) Return to original position
-  console.log('scrolling back to original position');
-  containerToScroll?.scrollTo(0, originalPos || 0);
+  containerToScroll.scrollTo(0, originalPos || 0);
 }
+
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export { buildContentPlaylist };
+export default buildContentPlaylist;
