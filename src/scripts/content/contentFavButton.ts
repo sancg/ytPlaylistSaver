@@ -14,13 +14,13 @@ function addFavButton() {
   btn.style.cursor = 'pointer';
 
   btn.onclick = async () => {
-    const title = document.title.replace(' - YouTube', '');
+    // TODO: Missing the published By attribute - low P
     const url = location.href;
-    const thumbnail = `https://i.ytimg.com/vi/${new URL(url).searchParams.get(
-      'v'
-    )}/hqdefault.jpg`;
+    const title = document.title.replace(' - YouTube', '');
+    const id = new URL(url).searchParams.get('v');
+    const thumbImg = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
-    const item = { title, url, thumbnail, addedAt: Date.now() };
+    const item = { id, title, url, thumbImg, addedAt: Date.now() };
 
     const existing =
       (await chrome.storage.local.get('download-ready'))['download-ready'] || [];

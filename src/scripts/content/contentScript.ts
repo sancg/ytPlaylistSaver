@@ -1,4 +1,3 @@
-import { sendToBackground } from '../../utils/actions/messages';
 import buildContentPlaylist from './yt_api/buildPlayList';
 console.log('[ContentScript] Loaded...');
 
@@ -24,8 +23,11 @@ async function handleNavigation() {
   if (!videoId) return;
 
   // Ask background if video is saved
-  const res = await sendToBackground({ type: 'is_saved', videoId });
-
+  const res = await chrome.runtime.sendMessage({
+    type: 'is_saved',
+    payload: { currentId: videoId },
+  });
+  console.log({ content_script_is_saved: res });
   // Notify UI injector script
   window.postMessage(
     {
@@ -59,6 +61,7 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 
 // Ask injector script to add the current video
 function injectAddVideo() {
+  console.log('Add fav from Main world!');
   window.postMessage({ source: 'ytps-content', type: 'user-click-add' }, '*');
 }
 
