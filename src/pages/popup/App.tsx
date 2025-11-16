@@ -1,8 +1,10 @@
-import './styles/app.css';
-import { focusExtensionTab, getPlaylistTab } from './utils/actions';
+import '../../styles/global.css';
+import { Popup } from './Popup';
+import { StrictMode } from 'react';
+import { getPlaylistTab } from '../../utils/actions';
 import { ArrowPathIcon, CloudArrowDownIcon } from '@heroicons/react/20/solid';
-import type { Video } from './types/video';
-import { Popup } from './pages/popup/Popup';
+import type { Video } from '../../types/video';
+import { createRoot } from 'react-dom/client';
 
 const refreshExtension = () => {
   chrome.runtime.reload();
@@ -10,12 +12,12 @@ const refreshExtension = () => {
 };
 
 function App() {
-  const openViewer = async () => {
-    const { id } = await chrome.windows.getCurrent();
+  // const openViewer = async () => {
+  //   const { id } = await chrome.windows.getCurrent();
 
-    const url = chrome.runtime.getURL('public/html/pages/playlist_viewer.html');
-    await focusExtensionTab(url, id!);
-  };
+  //   const url = chrome.runtime.getURL('public/html/pages/playlist_viewer.html');
+  //   await focusExtensionTab(url, id!);
+  // };
 
   const handleGetPlaylist = async () => {
     const { playlist, error } = await getPlaylistTab();
@@ -60,23 +62,21 @@ function App() {
                   className='transition-all duration-300 ease-in-out hover:scale-125 hover:cursor-pointer'
                 />
               </div>
-              <Popup />
             </div>
           </div>
           <p className='my-2 text-sm text-yt-text-secondary'>
             Manage playlists, upload JSON, and play inside a YouTube-like page.
           </p>
-          <button
-            //bg-[#e1002d]
-            className='bg-yt-accent-red font-bold hover:cursor-pointer hover:bg-red-700 px-3 py-2 rounded-2xl w-full'
-            onClick={openViewer}
-          >
-            Open Playlist Viewer
-          </button>
+          <Popup />
         </div>
       </main>
     </>
   );
 }
 
-export default App;
+const root = createRoot(document.getElementById('root') as HTMLElement);
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);

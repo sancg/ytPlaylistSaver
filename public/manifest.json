@@ -11,7 +11,6 @@
     "default_path": "src/pages/side_panel/side-panel.html",
     "default_icon": "assets/icons/dw_v3.3.png"
   },
-  "options_page": "public/html/pages/playlist_viewer.html",
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
@@ -30,7 +29,7 @@
   "web_accessible_resources": [
     {
       "resources": ["public/html/pages/playlist_viewer.html", "assets/*"],
-      "matches": ["<all_urls>"]
+      "matches": ["*://*.youtube.com/*"]
     }
   ],
   "permissions": ["tabs", "scripting", "storage", "tabGroups", "sidePanel"],
