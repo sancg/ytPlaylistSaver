@@ -54,13 +54,27 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
   }
 
   if (res.type === cs.ADD_VIDEO) {
-    chrome.storage.local.get('download-ready').then((res) => {
-      const list: Video[] = res['download-ready'] || [];
-      const exists = list.some((v) => v.id === res.video.id);
+    chrome.storage.local.get('download-ready').then((st) => {
+      const video = res.payload.video;
+      if (!video) {
+        console.log('[EARLY RETURN]');
+        return;
+      }
+      console.log({ video, res });
+      const list: Video[] = st['download-ready'] || [];
+      const exists = list.some((v) => {
+        if (!v.id) {
+          return false;
+        }
+        return v.id === video.id;
+      });
+      console.log('ADD VIDEO: ', { list, exists });
 
-      if (!exists) list.push(res.video);
+      if (!exists) list.push(video);
       chrome.storage.local.set({ 'download-ready': list });
-      sendResponse({ status: 'added' });
+
+      // chrome.runtime.sendMessage({ action: 'update_state', payload: { exists: true } });
+      sendResponse({ exists: true });
     });
     return true; // async
   }

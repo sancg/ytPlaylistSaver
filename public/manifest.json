@@ -14,12 +14,10 @@
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
-      "js": ["/assets/app/scripts/content/contentScript.js"]
-    },
-    {
-      "matches": ["*://*.youtube.com/watch*"],
-      "js": ["/assets/app/scripts/content/contentFavButton.js"],
-      "run_at": "document_idle"
+      "js": [
+        "/assets/app/scripts/content/contentScript.js",
+        "/assets/app/scripts/content/contentFavButton.js"
+      ]
     }
   ],
   "background": {

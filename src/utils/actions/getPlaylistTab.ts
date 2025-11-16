@@ -1,4 +1,4 @@
-import { ct } from '.';
+import { cs } from '../../scripts/shared/constants';
 import { sendMessageTab } from '.';
 import type { GetPlaylistCall } from '../../types/video';
 
@@ -7,7 +7,7 @@ async function getPlaylistTab(): Promise<GetPlaylistCall> {
 
   if (tab.id) {
     const { playlist, error } = await sendMessageTab<GetPlaylistCall>(tab.id, {
-      action: ct.EXTRACT_PLAYLIST,
+      action: cs.EXTRACT_PLAYLIST,
     });
 
     return { playlist, error };

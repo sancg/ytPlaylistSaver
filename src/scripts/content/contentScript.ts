@@ -27,12 +27,12 @@ async function handleNavigation() {
     type: 'is_saved',
     payload: { currentId: videoId },
   });
-  console.log({ content_script_is_saved: res });
+  console.log({ content_script_is_saved: res.exists });
   // Notify UI injector script
   window.postMessage(
     {
       source: 'ytps-content',
-      type: 'video-state',
+      type: 'update_state',
       exists: res.exists,
       videoId,
     },
@@ -42,8 +42,8 @@ async function handleNavigation() {
 // ----------------------------
 // Listen to extension messages
 // ----------------------------
-chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
-  if (request.action === 'extract_playlist') {
+chrome.runtime.onMessage.addListener((req, _sender, sendResponse) => {
+  if (req.action === 'extract_playlist') {
     (async () => {
       const { playlist, error } = await buildContentPlaylist(document);
       sendResponse({ playlist, error });
@@ -53,17 +53,41 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     return true;
   }
 
-  if (request.action === 'add_video') {
+  if (req.action === 'add_video') {
+    console.log('CS adding video... ', { req });
     injectAddVideo();
     return true;
   }
+
+  return { success: true };
 });
 
 // Ask injector script to add the current video
 function injectAddVideo() {
-  console.log('Add fav from Main world!');
-  window.postMessage({ source: 'ytps-content', type: 'user-click-add' }, '*');
+  console.log('[REACT to MAIN] Adding video...');
+  window.postMessage({ source: 'ytps-content', type: 'add_video' }, '*');
 }
 
+window.addEventListener('message', (ev) => {
+  const msg = ev.data;
+  if (!msg || msg.source !== 'ytps-injector') return;
+
+  if (msg.action === 'add_video') {
+    console.log('[CS] injector requested add_video: ', msg);
+
+    // Notify to the background if it could be saved
+    chrome.runtime
+      .sendMessage({ type: 'add_video', payload: { video: msg.payload.video } })
+      .then((r) => {
+        const msg = {
+          source: 'ytps-content',
+          type: 'update_state',
+          exists: r.exists,
+        };
+        console.log('[CS] sending back to button [Real World]...', msg);
+        window.postMessage(msg); // The contentFavButton receives the update
+      });
+  }
+});
 // Run Navigation
 handleNavigation();
