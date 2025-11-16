@@ -1,30 +1,35 @@
 import '../../styles/global.css';
 import React, { useEffect, useState } from 'react';
+import { cs } from '../../scripts/shared/constants';
 import { createRoot } from 'react-dom/client';
 import { Video } from '../../types/video';
-import { ArrowUpOnSquareStackIcon } from '@heroicons/react/20/solid';
-import { VideoList } from '../../components/VideoList';
 import { extractYouTubeID } from '../../scripts/content/yt_api/extraYoutube';
-const STORAGE_KEY = 'playlist';
+import { sendToBackground } from '../../utils/actions/messages';
+import { ArrowUpOnSquareStackIcon } from '@heroicons/react/20/solid';
 
 function SidePanel() {
   const [playlist, setPlaylist] = useState<Video[]>([]);
-  const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
+  // const [multiPlaylist, setMultiPlaylist] = useState<Video[][]>([]);
+  const [currentVideo, _setCurrentVideo] = useState<Video | null>(null);
 
   useEffect(() => {
-    chrome.storage.local.get([STORAGE_KEY], (result) => {
-      if (result[STORAGE_KEY]) {
-        setPlaylist(result[STORAGE_KEY]);
+    sendToBackground({ type: cs.GET_VIDEOS }).then((li: Video[]) => {
+      if (li.length === 0) {
+        console.warn('Empty object?');
+        return;
       }
+
+      // FIXME: the retrieval list keeps yelling that filter is not a function
+      console.log(li);
+      const noStandard = [];
+      if (noStandard.length > 0) {
+        alert('DB corrupted 😈');
+        return;
+      }
+
+      setPlaylist(li);
     });
   }, []);
-
-  // Save playlist to chrome.storage whenever it changes
-  useEffect(() => {
-    if (playlist.length > 0) {
-      chrome.storage.local.set({ [STORAGE_KEY]: playlist });
-    }
-  }, [playlist]);
 
   const normalizePlaylist = (obj: {
     playlist?: Video[];
@@ -65,17 +70,22 @@ function SidePanel() {
     reader.readAsText(file);
   };
 
-  // Play selected video
-  const playVideo = (video: Video) => {
-    setCurrentVideo(video);
+  const renderPlaylists = () => {
+    if (!playlist) return;
+    return (
+      <div>
+        <img src={playlist[0]?.thumbImg || ''} />
+      </div>
+    );
   };
+
   return (
     // TODO: Fixing bug with the height display on Side Panel.
     <main className='bg-yt-bg w-full h-full p-2'>
       <div className='relative min-w-3xs h-11/12 bg-yt-bg overflow-y-auto shadow-lg border rounded-xl border-yt-border text-yt-text-primary '>
         <div className='static flex items-center justify-between p-4 bg-yt-bg-secondary w-full'>
           <div className='flex flex-col'>
-            <h2 className='text-lg font-bold'>Playlist</h2>
+            <h2 className='text-lg font-bold'>Playlists</h2>
             {currentVideo ? <span>1/2</span> : ''}
           </div>
           <label className='flex min-w-28 px-3 py-2 justify-around place-items-center cursor-pointer font-bold text-sm bg-yt-bg-tertiary rounded-2xl shadow-2xl hover:bg-yt-border'>
@@ -84,8 +94,8 @@ function SidePanel() {
             <input type='file' accept='.json' className='hidden' onChange={handleFileUpload} />
           </label>
         </div>
-        <VideoList selectVideo={playVideo} currentVideo={currentVideo} list={playlist} />
       </div>
+      <div>{renderPlaylists()}</div>
     </main>
   );
 }
