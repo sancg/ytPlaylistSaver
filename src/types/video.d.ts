@@ -10,6 +10,7 @@ type Video = {
 
 export interface GetPlaylistCall {
   playlist: Video[];
+  skipVideos: { video: Video[]; errorMsg: string }[];
   error: string | null;
 }
 

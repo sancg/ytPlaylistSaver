@@ -4,8 +4,14 @@ import { sendToBackground } from '../../utils/actions/messages';
 export const Popup = () => {
   const openSidePanel = async () => {
     // FIXME: Related to the side_panel view - TODO - only show in yt tabs
-    const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-    if (tab.id) await sendToBackground({ type: cs.OPEN_PANEL, payload: { id: tab.id } });
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab.id) {
+      const res = await sendToBackground({
+        type: cs.OPEN_PANEL,
+        payload: { currentTab: tab },
+      });
+      console.log({ POPUP: res });
+    }
   };
 
   // const renderIconSP = () => {

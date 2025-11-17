@@ -26,7 +26,7 @@ async function buildContentPlaylist(ctx: Document) {
   const isLocator = validLocator && [...validLocator]?.length >= 1;
 
   if (!isLocator) {
-    const obj = { error: 'Playlist locator not found', playlist };
+    const obj = { playlist, skipVideos, error: 'Playlist locator not found' };
     console.error(obj.error);
     return obj;
   }

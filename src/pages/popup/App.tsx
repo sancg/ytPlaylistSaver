@@ -6,12 +6,11 @@ import { ArrowPathIcon, CloudArrowDownIcon } from '@heroicons/react/20/solid';
 import type { Video } from '../../types/video';
 import { createRoot } from 'react-dom/client';
 
-const refreshExtension = () => {
-  chrome.runtime.reload();
-  chrome.tabs.reload();
-};
-
 function App() {
+  const refreshExtension = () => {
+    chrome.runtime.reload();
+    chrome.tabs.reload();
+  };
   // const openViewer = async () => {
   //   const { id } = await chrome.windows.getCurrent();
 
@@ -20,15 +19,20 @@ function App() {
   // };
 
   const handleGetPlaylist = async () => {
-    const { playlist, error } = await getPlaylistTab();
-    console.log({ ext_log: { playlist, error } });
+    const { playlist, skipVideos, error } = await getPlaylistTab();
+    console.log({ ext_log: { playlist, skipVideos, error } });
+
+    if (skipVideos || error) {
+      console.warn('Controlled Error: ', { playlist, skipVideos, error });
+      return;
+    }
 
     if (playlist) {
       const currentIndex = playlist.findIndex((p: Video) => p.currentIndex);
       const exportResult = { currentIndex, playlist };
       const fileName = prompt('Playlist Name:', 'playlist');
       if (!fileName) {
-        console.warn("Download was 'canceled' from the user");
+        console.log("Download was 'canceled' from the user");
         return;
       }
 
