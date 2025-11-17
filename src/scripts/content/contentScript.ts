@@ -6,7 +6,7 @@ let lastUrl = location.href;
 const titleObserver = new MutationObserver(() => {
   if (location.href !== lastUrl) {
     lastUrl = location.href;
-    handleNavigation();
+    // handleNavigation();
   }
 });
 
@@ -27,7 +27,7 @@ async function handleNavigation() {
     type: 'is_saved',
     payload: { currentId: videoId },
   });
-  console.log({ content_script_is_saved: res.exists });
+
   // Notify UI injector script
   window.postMessage(
     {
@@ -43,17 +43,23 @@ async function handleNavigation() {
 // Listen to extension messages
 // ----------------------------
 chrome.runtime.onMessage.addListener((req, _sender, sendResponse) => {
+  if (req.action === 'url_change') {
+    console.log('[CS] Reading message rom the BG worker...', req);
+    handleNavigation(); // weird that an async function could be called even if it is not processed?
+  }
+
   if (req.action === 'extract_playlist') {
     (async () => {
-      const { playlist, error } = await buildContentPlaylist(document);
-      sendResponse({ playlist, error });
+      const { playlist, skipVideos, error } = await buildContentPlaylist(document);
+      sendResponse({ playlist, skipVideos, error });
     })();
-
+    console.log('[CS] scraping completed...');
     // return true keeps the message port open for async sendResponse()
     return true;
   }
 
   if (req.action === 'add_video') {
+    console.log('ALSO TRIGGERED BY ACCIDENT?');
     console.log('CS adding video... ', { req });
     injectAddVideo();
     return true;
@@ -89,5 +95,3 @@ window.addEventListener('message', (ev) => {
       });
   }
 });
-// Run Navigation
-handleNavigation();
