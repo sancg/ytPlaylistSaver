@@ -1,5 +1,5 @@
 import { cs } from '../shared/constants';
-import type { Video } from '../../types/video';
+import type { StoragePlaylist, Video } from '../../types/video';
 
 console.log('[Background] Ready...');
 // NOTE: Open the SidePanel only in the YT tabs... see the docs.
@@ -10,6 +10,11 @@ let tabUrl: string = '';
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (!tab.url) return;
   tabUrl = tab.url;
+
+  // Check tab focus
+  if (!tab.active) {
+    console.log('[BG] tab out of focus?');
+  }
 
   if (info.status === 'complete') {
     const url = new URL(tab.url);
@@ -96,8 +101,10 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
   }
 
   if (res.type === cs.GET_VIDEOS) {
-    chrome.storage.local.get('download-ready').then((res) => {
-      sendResponse({ videos: (res['download-ready'] as Video[]) || [] });
+    chrome.storage.local.get<StoragePlaylist>(null).then((data) => {
+      console.log('[BG] Getting key-stored...', { data });
+      if (!res) sendResponse({ res, error: 'No data available' });
+      sendResponse({ data, error: null });
     });
     return true;
   }

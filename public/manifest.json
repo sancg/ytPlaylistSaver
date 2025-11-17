@@ -30,7 +30,7 @@
       "matches": ["*://*.youtube.com/*"]
     }
   ],
-  "permissions": ["tabs", "scripting", "storage", "tabGroups", "sidePanel"],
+  "permissions": ["tabs", "scripting", "storage", "sidePanel"],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com;"
   }

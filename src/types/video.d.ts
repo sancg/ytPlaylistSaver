@@ -8,10 +8,12 @@ type Video = {
   currentIndex?: boolean;
 };
 
-export interface GetPlaylistCall {
+interface GetPlaylistCall {
   playlist: Video[];
   skipVideos: { video: Video[]; errorMsg: string }[];
   error: string | null;
 }
 
-export { Video, GetPlaylistCall };
+type StoragePlaylist = { [key: string]: Video[] };
+
+export { Video, GetPlaylistCall, StoragePlaylist };

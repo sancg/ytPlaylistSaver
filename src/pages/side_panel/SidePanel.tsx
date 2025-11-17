@@ -2,88 +2,50 @@ import '../../styles/global.css';
 import React, { useEffect, useState } from 'react';
 import { cs } from '../../scripts/shared/constants';
 import { createRoot } from 'react-dom/client';
-import { Video } from '../../types/video';
-import { extractYouTubeID } from '../../scripts/content/yt_api/extraYoutube';
-import { sendToBackground } from '../../utils/actions/messages';
+import { BackgroundResponse, sendToBackground } from '../../utils/actions/messages';
 import { ArrowUpOnSquareStackIcon } from '@heroicons/react/20/solid';
+import type { StoragePlaylist, Video } from '../../types/video';
+import handleFileUpload from './uploadPlaylist';
 
 function SidePanel() {
-  const [playlist, setPlaylist] = useState<Video[]>([]);
-  // const [multiPlaylist, setMultiPlaylist] = useState<Video[][]>([]);
+  const [_playlist, setPlaylist] = useState<Video[]>([]);
+  const [multiPlaylist, setMultiPlaylist] = useState<StoragePlaylist>({});
   const [currentVideo, _setCurrentVideo] = useState<Video | null>(null);
 
   useEffect(() => {
-    sendToBackground({ type: cs.GET_VIDEOS }).then((li: Video[]) => {
-      if (li.length === 0) {
-        console.warn('Empty object?');
-        return;
+    sendToBackground<BackgroundResponse<StoragePlaylist>>({
+      type: cs.GET_VIDEOS,
+    }).then((res) => {
+      if (!res.error && res.data) {
+        setMultiPlaylist(res.data);
       }
-
-      // FIXME: the retrieval list keeps yelling that filter is not a function
-      console.log(li);
-      const noStandard = [];
-      if (noStandard.length > 0) {
-        alert('DB corrupted 😈');
-        return;
-      }
-
-      setPlaylist(li);
     });
   }, []);
 
-  const normalizePlaylist = (obj: {
-    playlist?: Video[];
-    playList?: Video[]; // legacy - I returned an object with this name
-  }): Video[] | null => {
-    const list = obj.playlist || obj.playList;
-    if (!Array.isArray(list)) return null;
-
-    return list.map((v) => ({
-      ...v,
-      id: v.id ?? extractYouTubeID(v.url || ''),
-    }));
-  };
-
-  // Handle File Upload
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const parseObject = JSON.parse(e.target?.result as string);
-        console.log({ parseObject });
-        const uploadedPlaylist = normalizePlaylist(parseObject);
-        console.log({ uploadedPlaylist });
-
-        if (!uploadedPlaylist) {
-          console.error('Invalid JSON format. Expected an array of videos.');
-          return;
-        }
-
-        setPlaylist(uploadedPlaylist);
-      } catch (err) {
-        console.error('Error parsing JSON file', err);
-      }
-    };
-    reader.readAsText(file);
-  };
-
   const renderPlaylists = () => {
-    if (!playlist) return;
+    if (!multiPlaylist) return;
+    console.log('Rendering Multi-playlist...', { multiPlaylist });
     return (
       <div>
-        <img src={playlist[0]?.thumbImg || ''} />
+        {Object.entries(multiPlaylist).map(([key, val]) => {
+          console.log({ key });
+
+          return (
+            <div className='flex flex-1 items-center'>
+              <img src={val[0].thumbImg}></img>
+            </div>
+          );
+        })}
       </div>
     );
   };
 
   return (
     // TODO: Fixing bug with the height display on Side Panel.
-    <main className='bg-yt-bg w-full h-full p-2'>
-      <div className='relative min-w-3xs h-11/12 bg-yt-bg overflow-y-auto shadow-lg border rounded-xl border-yt-border text-yt-text-primary '>
-        <div className='static flex items-center justify-between p-4 bg-yt-bg-secondary w-full'>
+    <main className='bg-yt-bg w-full h-lvh p-2 text-yt-text-primary'>
+      <div className='relative min-w-3xs h-full bg-yt-bg shadow-lg border rounded-xl border-yt-border  overflow-y-hidden'>
+        {/* ------ Loading JSON header ----- */}
+        <div className='flex items-center justify-between p-4 bg-yt-bg-secondary w-full'>
           <div className='flex flex-col'>
             <h2 className='text-lg font-bold'>Playlists</h2>
             {currentVideo ? <span>1/2</span> : ''}
@@ -91,11 +53,17 @@ function SidePanel() {
           <label className='flex min-w-28 px-3 py-2 justify-around place-items-center cursor-pointer font-bold text-sm bg-yt-bg-tertiary rounded-2xl shadow-2xl hover:bg-yt-border'>
             <ArrowUpOnSquareStackIcon width={20} />
             Upload
-            <input type='file' accept='.json' className='hidden' onChange={handleFileUpload} />
+            <input
+              type='file'
+              accept='.json'
+              className='hidden'
+              onChange={(ev) => handleFileUpload(ev, setPlaylist)}
+            />
           </label>
         </div>
+        {/* -------------------------------- */}
+        <div className='h-full overflow-auto'>{renderPlaylists()}</div>
       </div>
-      <div>{renderPlaylists()}</div>
     </main>
   );
 }

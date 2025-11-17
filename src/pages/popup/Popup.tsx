@@ -6,25 +6,13 @@ export const Popup = () => {
     // FIXME: Related to the side_panel view - TODO - only show in yt tabs
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab.id) {
-      const res = await sendToBackground({
+      await sendToBackground({
         type: cs.OPEN_PANEL,
         payload: { currentTab: tab },
       });
-      console.log({ POPUP: res });
     }
   };
 
-  // const renderIconSP = () => {
-  //   return (
-  //     <div className='p-2' title='Open SidePanel'>
-  //       <ArrowLeftEndOnRectangleIcon
-  //         className='transition-all duration-300 ease-in-out hover:scale-125 hover:cursor-pointer'
-  //         width={20}
-  //         onClick={openSidePanel}
-  //       />
-  //     </div>
-  //   );
-  // };
   return (
     <button
       //bg-[#e1002d]
