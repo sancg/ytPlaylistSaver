@@ -2,9 +2,9 @@ import { cs } from '../shared/constants';
 import type { Video } from '../../types/video';
 
 console.log('[Background] Ready...');
-// TODO: Open the SidePanel only in the YT tabs... see the docs.
+// NOTE: Open the SidePanel only in the YT tabs... see the docs.
 // https://github.com/GoogleChrome/chrome-extensions-samples/blob/main/functional-samples/cookbook.sidepanel-site-specific/service-worker.js
-
+// It is fix when is in the same tab, I've should look into the set up better.
 // Detecting tab URL changes
 let tabUrl: string = '';
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
@@ -23,9 +23,13 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
           payload: { updatedUrl: tab.url },
         });
       }
+      await chrome.sidePanel.setOptions({
+        tabId: tab.id,
+        path: 'src/pages/side_panel/side-panel.html',
+        enabled: true,
+      });
     } else {
-      const a = await chrome.sidePanel.getOptions({ tabId });
-      console.log({ spOpt: a, tab });
+      await chrome.sidePanel.setOptions({ tabId: tab.id, enabled: false });
     }
   }
 });
@@ -38,11 +42,6 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
 
     (async () => {
       await chrome.sidePanel.open({ tabId: id });
-      await chrome.sidePanel.setOptions({
-        tabId: id,
-        path: 'src/pages/side_panel/side-panel.html',
-        enabled: true,
-      });
     })();
 
     return true;
