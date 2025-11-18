@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Playlist Saver",
-  "version": "1.1.0",
-  "description": "YouTube Playlist saver in a local file",
+  "version": "1.2.0",
+  "description": "TY Playlist saver for local downloads and retrieval",
   "action": {
     "default_popup": "src/pages/popup/popup.html",
     "default_icon": "assets/icons/dw_v3.3.png"
@@ -30,8 +30,9 @@
       "matches": ["*://*.youtube.com/*"]
     }
   ],
-  "permissions": ["tabs", "scripting", "storage", "sidePanel"],
+  "permissions": ["tabs", "scripting", "storage", "sidePanel", "downloads"],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com;"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com;",
+    "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' 'unsafe-inline' 'unsafe-eval'; child-src 'self';"
   }
 }

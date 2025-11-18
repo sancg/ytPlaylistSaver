@@ -7,6 +7,9 @@ export const cs = {
   AVAILABLE_LIST: 'get_keys',
   REMOVE_VIDEO: 'remove_video',
   OPEN_PANEL: 'open_local_panel',
+
+  // Workers dir:
+  PYODIDE_DIR: 'assets/app/scripts/background/py_worker/py-worker.js',
 } as const;
 
 export type MessageType = (typeof cs)[keyof typeof cs];

@@ -1,11 +1,13 @@
 import '../../styles/global.css';
 import React, { useEffect, useState } from 'react';
+import handleFileUpload from './uploadPlaylist';
 import { cs } from '../../scripts/shared/constants';
 import { createRoot } from 'react-dom/client';
 import { BackgroundResponse, sendToBackground } from '../../utils/actions/messages';
 import { ArrowUpOnSquareStackIcon } from '@heroicons/react/20/solid';
+
 import type { StoragePlaylist, Video } from '../../types/video';
-import handleFileUpload from './uploadPlaylist';
+import LoadPy from './pyodide_test';
 
 function SidePanel() {
   const [_playlist, setPlaylist] = useState<Video[]>([]);
@@ -62,7 +64,10 @@ function SidePanel() {
           </label>
         </div>
         {/* -------------------------------- */}
-        <div className='h-full overflow-auto'>{renderPlaylists()}</div>
+        <div className='h-full overflow-auto'>
+          {renderPlaylists()}
+          <LoadPy />
+        </div>
       </div>
     </main>
   );
