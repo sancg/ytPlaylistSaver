@@ -13,8 +13,8 @@ interface VideoStateEvent {
 // }
 
 // Track current state
-let button: HTMLButtonElement | null;
 const BUTTON_ID = 'ytps-fav-btn';
+let button: HTMLButtonElement | null = document.getElementById(BUTTON_ID) as HTMLButtonElement;
 
 /**
  * Create or update the injected button

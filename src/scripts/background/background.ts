@@ -13,10 +13,13 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
 
   // Check tab focus
   if (!tab.active) {
-    console.log('[BG] tab out of focus?');
+    console.log('[BG] tab out of focus?', { tab, info });
   }
 
   if (info.status === 'complete') {
+    if (info.title) {
+      console.log('[BG] Complete change - Render just one button');
+    }
     const url = new URL(tab.url);
     // Check URL changes to update state on the UI -> M.W.
     if (url.href.includes(cs.ORIGIN)) {

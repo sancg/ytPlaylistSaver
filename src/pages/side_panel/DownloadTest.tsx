@@ -1,19 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { PyWorkerRuntime } from '../../scripts/background/py_worker/PyWorkerRuntime';
+import { useState } from 'react';
 
 export default function LoadPy() {
-  const pyRef = useRef<PyWorkerRuntime | null>(null);
   const [output, setOutput] = useState<string>('waiting...');
 
-  useEffect(() => {
-    pyRef.current = new PyWorkerRuntime();
-  }, []);
-
   async function helloPython() {
-    if (!pyRef.current) return;
-
-    const result = await pyRef.current.run('1 + 1');
-    setOutput(`Python says: ${result}`);
+    setOutput('testing chrome.downloads');
   }
 
   return (
