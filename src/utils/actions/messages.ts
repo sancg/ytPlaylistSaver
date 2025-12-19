@@ -10,4 +10,15 @@ function sendMessageTab<T = unknown>(tabId: number, message: unknown): Promise<T
   });
 }
 
-export { sendMessageTab };
+export type BackgroundResponse<T> = {
+  data: T | null;
+  error: string | null;
+};
+
+function sendToBackground<TResponse>(msg: any): Promise<TResponse> {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage(msg, (response) => resolve(response));
+  });
+}
+
+export { sendMessageTab, sendToBackground };

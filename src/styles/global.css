@@ -1,13 +1,14 @@
 @import 'tailwindcss';
-@config "../tailwind.config.js";
+@config "../../tailwind.config.js";
 
 @theme {
-  --yt-screen: calc(100dvh - 30px);
+  --yt-screen: calc(100dvh - 35px);
   --yt-active: rgba(51, 36, 23, 0.949);
 }
+
 :root {
   font-family: 'Noto Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
-
+  scroll-behavior: smooth;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -15,5 +16,5 @@
 
 html,
 body {
-  font-family: 'Noto Sans';
+  /* font-family: 'Noto Sans'; */
 }

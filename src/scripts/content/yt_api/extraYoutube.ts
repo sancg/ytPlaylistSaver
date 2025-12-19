@@ -3,7 +3,6 @@ export function extractYouTubeID(url: string): string {
     if (!url) return '';
     // support youtu.be short links
     const u = new URL(url);
-    console.log({ exUrl: u });
 
     if (u.hostname.includes('youtu.be')) {
       return u.pathname.slice(1);
@@ -20,7 +19,6 @@ export function extractYouTubeID(url: string): string {
     console.error(e);
     // fallback: regex find 11 char id
     const match = url.match(/([A-Za-z0-9_-]{11})/);
-    console.log({ fbURL: match });
     return match ? match[1] : '';
   }
 }

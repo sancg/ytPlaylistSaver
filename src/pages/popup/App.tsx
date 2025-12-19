@@ -1,0 +1,58 @@
+import '../../styles/global.css';
+import { Popup } from './Popup';
+import { StrictMode } from 'react';
+import { ArrowPathIcon, CloudArrowDownIcon } from '@heroicons/react/20/solid';
+import { createRoot } from 'react-dom/client';
+import handleGetPlaylist from './handlePlaylist';
+
+function App() {
+  const refreshExtension = () => {
+    chrome.runtime.reload();
+    chrome.tabs.reload();
+  };
+  // const openViewer = async () => {
+  //   const { id } = await chrome.windows.getCurrent();
+
+  //   const url = chrome.runtime.getURL('public/html/pages/playlist_viewer.html');
+  //   await focusExtensionTab(url, id!);
+  // };
+
+  return (
+    <>
+      <main>
+        <div className='p-4 w-72 bg-yt-bg text-yt-text-primary'>
+          <div className='flex items-center justify-between mb-2'>
+            <h2 className='text-lg font-bold'>Playlist Saver</h2>
+            <div className='flex items-center justify-around gap-1'>
+              <div className='p-2' title='Get Playlist'>
+                <CloudArrowDownIcon
+                  className='transition-all duration-300 ease-in-out hover:scale-125 hover:cursor-pointer'
+                  width={20}
+                  onClick={handleGetPlaylist}
+                />
+              </div>
+              <div className='p-2' title='Refresh App'>
+                <ArrowPathIcon
+                  width={20}
+                  onClick={refreshExtension}
+                  className='transition-all duration-300 ease-in-out hover:scale-125 hover:cursor-pointer'
+                />
+              </div>
+            </div>
+          </div>
+          <p className='my-2 text-sm text-yt-text-secondary'>
+            Manage playlists, upload JSON, and play inside a YouTube-like page.
+          </p>
+          <Popup />
+        </div>
+      </main>
+    </>
+  );
+}
+
+const root = createRoot(document.getElementById('root') as HTMLElement);
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);

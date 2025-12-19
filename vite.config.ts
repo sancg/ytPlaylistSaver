@@ -3,22 +3,52 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { resolve } from 'node:path';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+
   build: {
+    outDir: 'dist',
+
     rollupOptions: {
       input: {
-        index: resolve(__dirname, 'html/index.html'),
-        contentScript: resolve(__dirname, 'src/content/contentScript.ts'),
-        viewer: resolve(__dirname, 'html/pages/playlist_viewer.html'),
+        popup: 'src/pages/popup/popup.html',
+        // viewer: 'public/html/pages/playlist_viewer.html',
+        sidePanel: 'src/pages/side_panel/side-panel.html',
+
+        // scripts
+        contentScript: resolve(__dirname, 'src/scripts/content/contentScript.ts'),
+        contentFavButton: resolve(__dirname, 'src/scripts/content/contentFavButton.ts'),
+        background: resolve(__dirname, 'src/scripts/background/background.ts'),
       },
+
       output: {
-        entryFileNames: 'assets/app/[name].js',
-        chunkFileNames: 'assets/app/[name]-[hash].js',
+        // put UI bundles in app/ui/
+        entryFileNames(chunk) {
+          if (chunk.name === 'background') return 'assets/app/scripts/background/[name].js';
+
+          if (chunk.name === 'contentScript' || chunk.name === 'contentFavButton')
+            return 'assets/app/scripts/content/[name].js';
+
+          return 'assets/app/ui/[name].js';
+        },
+
+        chunkFileNames(chunkInfo) {
+          // Never create shared chunks for content scripts
+          if (chunkInfo.facadeModuleId?.includes('content/')) {
+            return 'assets/app/scripts/content/[name].js';
+          }
+
+          // background cannot use shared chunks either
+          if (chunkInfo.facadeModuleId?.includes('background/')) {
+            return 'assets/app/scripts/background/[name].js';
+          }
+
+          // UI can share chunks
+          return 'assets/app/bundler/[name]-[hash].js';
+        },
+
         assetFileNames: 'assets/[name].[ext]',
       },
     },
-    // outDir: 'dist',
   },
 });
