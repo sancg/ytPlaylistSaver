@@ -7,11 +7,6 @@ interface VideoStateEvent {
   videoId: string;
 }
 
-// interface AddEvent {
-//   source: 'ytps-content';
-//   type: 'user-click-add';
-// }
-
 // Track current state
 const BUTTON_ID = 'ytps-fav-btn';
 let button: HTMLButtonElement | null = document.getElementById(BUTTON_ID) as HTMLButtonElement;
@@ -123,7 +118,7 @@ window.addEventListener('message', (ev) => {
 
   // contentScript → injector : user clicked “add” inside popup
   if (msg.type === 'user-click-add') {
-    console.log('[Injector] Received add trigger from popup');
+    console.log('[Injector-Extension] Received add trigger from popup');
     simulateClick();
   }
 });

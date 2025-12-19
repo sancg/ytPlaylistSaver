@@ -7,7 +7,7 @@ import { BackgroundResponse, sendToBackground } from '../../utils/actions/messag
 import { ArrowUpOnSquareStackIcon } from '@heroicons/react/20/solid';
 
 import type { StoragePlaylist, Video } from '../../types/video';
-import LoadPy from './pyodide_test';
+import LoadPy from './DownloadTest';
 
 function SidePanel() {
   const [_playlist, setPlaylist] = useState<Video[]>([]);
