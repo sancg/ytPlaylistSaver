@@ -1,53 +1,30 @@
 import { cs } from '../shared/constants';
+import { handleTabState } from './handleStatePanel';
 import type { StoragePlaylist, Video } from '../../types/video';
 
 console.log('[Background] Ready...');
+
 // NOTE: Open the SidePanel only in the YT tabs... see the docs.
 // https://github.com/GoogleChrome/chrome-extensions-samples/blob/main/functional-samples/cookbook.sidepanel-site-specific/service-worker.js
-// It is fix when is in the same tab, I've should look into the set up better.
 // Detecting tab URL changes
 let tabUrl: string = '';
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
-  if (!tab.url) return;
+  if (!tab.url || !info.url) return;
   tabUrl = tab.url;
 
-  // Check tab focus
-  if (!tab.active) {
-    console.log('[BG] tab out of focus?', { tab, info });
-  }
+  handleTabState(tabId, tabUrl, 'onUpdated');
+});
 
-  if (info.status === 'complete') {
-    if (info.title) {
-      console.log('[BG] Complete change - Render just one button');
-    }
-    const url = new URL(tab.url);
-    // Check URL changes to update state on the UI -> M.W.
-    if (url.href.includes(cs.ORIGIN)) {
-      console.log({ info, tab, tabUrl, url: tab.url });
-      if (tabId === tab.id) {
-        console.log('[BG] Detecting change on the URL....');
-        await chrome.tabs.sendMessage(tabId, {
-          action: 'url_change',
-          payload: { updatedUrl: tab.url },
-        });
-      }
-      await chrome.sidePanel.setOptions({
-        tabId: tab.id,
-        path: 'src/pages/side_panel/side-panel.html',
-        enabled: true,
-      });
-    } else {
-      await chrome.sidePanel.setOptions({ tabId: tab.id, enabled: false });
-    }
-  }
+chrome.tabs.onActivated.addListener(async ({ tabId }) => {
+  const tab = await chrome.tabs.get(tabId);
+  if (!tab.url) return;
+
+  handleTabState(tabId, tab.url, 'onActivated');
 });
 
 chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
   if (res.type === cs.OPEN_PANEL) {
     const { id } = res.payload.currentTab;
-    // Intended to allow sidePanel if the URL is different from cs.ORIGIN
-    // console.log({ tabUrl, sender, currentTab: url });
-
     (async () => {
       await chrome.sidePanel.open({ tabId: id });
     })();
