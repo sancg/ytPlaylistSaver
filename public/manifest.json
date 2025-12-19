@@ -31,6 +31,14 @@
     }
   ],
   "permissions": ["tabs", "scripting", "storage", "sidePanel", "downloads"],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+B",
+        "mac": "Ctrl+B"
+      }
+    }
+  },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com;"
   }
