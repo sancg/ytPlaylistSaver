@@ -32,8 +32,11 @@ let tabUrl: string = '';
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (!tab.url || !info.url) return;
   tabUrl = tab.url;
+  await handleTabState(tabId, tabUrl, 'onUpdated');
 
-  handleTabState(tabId, tabUrl, 'onUpdated');
+  if (info.url.includes(cs.ORIGIN)) {
+    await chrome.tabs.sendMessage(tabId, { action: 'url_change', payload: { tab } });
+  }
 });
 
 chrome.tabs.onActivated.addListener(async ({ tabId }) => {

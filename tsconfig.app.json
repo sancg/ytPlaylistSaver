@@ -26,6 +26,11 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "src/scripts/content/contentScript.ts", "public"],
+  "include": [
+    "src",
+    "src/scripts/content/contentScript.ts",
+    "src/scripts/content/contentFavButton.ts",
+    "public"
+  ],
   "exclude": ["node_modules", "dist"]
 }

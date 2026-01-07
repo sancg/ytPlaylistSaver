@@ -7,7 +7,7 @@ const titleObserver = new MutationObserver(() => {
   console.log({ nowUrl: location.href, lastUrl });
   if (location.href !== lastUrl) {
     lastUrl = location.href;
-    // handleNavigation();
+    handleNavigation();
   }
 });
 
@@ -18,9 +18,9 @@ titleObserver.observe(document.querySelector('title')!, {
 
 // Handle injection button on navigation changes
 async function handleNavigation() {
-  console.log('[CS] Navigation detected.');
-
   const videoId = new URL(location.href).searchParams.get('v');
+
+  console.log('[CS] Navigation detected.', { videoId });
   if (!videoId) return;
 
   const msg = { type: 'is_saved', payload: { currentId: videoId } };
@@ -43,7 +43,7 @@ async function handleNavigation() {
 // ----------------------------
 chrome.runtime.onMessage.addListener((req, _sender, sendResponse) => {
   if (req.action === 'url_change') {
-    console.log('[CS] Reading message from the BG worker...', req);
+    console.log('[CS] action: "url_change"; Reading message from the BG worker...', { req });
     handleNavigation(); // weird that an async function could be called even if it is not processed?
     return { success: true };
   }
