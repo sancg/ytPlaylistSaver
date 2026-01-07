@@ -7,10 +7,6 @@
     "default_popup": "src/pages/popup/popup.html",
     "default_icon": "assets/icons/dw_v3.3.png"
   },
-  "side_panel": {
-    "default_path": "src/pages/side_panel/side-panel.html",
-    "default_icon": "assets/icons/dw_v3.3.png"
-  },
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
@@ -35,8 +31,15 @@
     "_execute_action": {
       "suggested_key": {
         "default": "Ctrl+B",
-        "mac": "Ctrl+B"
+        "mac": "Command+B"
       }
+    },
+    "toggle-side-panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+P",
+        "mac": "Ctrl+Shift+P"
+      },
+      "description": "toggle sidePanel view"
     }
   },
   "content_security_policy": {

@@ -1,5 +1,3 @@
-// console.log('[Injector] Loaded UI injector');
-
 interface VideoStateEvent {
   source: 'ytps-content';
   type: 'update_state';
@@ -7,37 +5,102 @@ interface VideoStateEvent {
   videoId: string;
 }
 
-// Track current state
-const BUTTON_ID = 'ytps-fav-btn';
-let button: HTMLButtonElement | null = document.getElementById(BUTTON_ID) as HTMLButtonElement;
+type YoutubeButtonOpts = {
+  id: string;
+  icon: string;
+  activeIcon?: string;
+  tooltip: string;
+  activeTooltip?: string;
+  isActive?: boolean;
+  onClick?: () => void;
+};
 
+function createYTbutton({
+  id,
+  icon,
+  activeIcon,
+  tooltip,
+  activeTooltip,
+  isActive = false,
+  onClick,
+}: YoutubeButtonOpts): HTMLButtonElement {
+  const btn = document.createElement('button');
+
+  btn.id = id;
+  btn.type = 'button';
+  btn.className = 'yt-native-btn';
+  btn.innerHTML = isActive && activeIcon ? activeIcon : icon;
+  btn.title = isActive && activeTooltip ? activeTooltip : tooltip;
+
+  btn.style.border = 'none';
+  btn.style.display = 'inline-flex';
+  btn.style.alignItems = 'center';
+  btn.style.justifyContent = 'center';
+  btn.style.width = '40px';
+  btn.style.marginRight = '8px';
+  btn.style.borderRadius = '50%';
+  btn.style.cursor = 'pointer';
+  btn.style.color = '#fff';
+  btn.style.background = 'rgba(255,255,255,0.1)';
+
+  btn.addEventListener('mouseenter', () => {
+    btn.style.background = 'rgba(255,255,255,0.2)';
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    btn.style.background = 'rgba(255,255,255,0.1)';
+  });
+
+  if (onClick) {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      onClick();
+    });
+  }
+  return btn;
+}
 /**
- * Create or update the injected button
+ * Renders the button style and update its state depending on the events send by [CS]
  */
 function renderButton(isSaved: boolean) {
+  // Track current state
+  const BUTTON_ID = 'ytps-fav-btn';
+  let button: HTMLButtonElement | null = document.getElementById(
+    BUTTON_ID
+  ) as HTMLButtonElement;
+
+  const heart = `
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+  <path stroke-linecap="round" stroke-linejoin="round"
+    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+</svg>
+`;
+
+  const heartAdded = `
+<svg viewBox="0 0 24 24" fill="currentColor">
+  <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218
+    25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174
+    2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12
+    5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322
+    5.437 5.25 0 3.925-2.438 7.111-4.739 9.256"/>
+</svg>
+`;
+
   // If button exists, update it
   if (button) {
-    updateButtonState(button, isSaved);
+    updateButtonState(button, isSaved, heartAdded, heart);
     return;
   }
 
   waitForContainer((container) => {
-    button = document.createElement('button');
-    button.id = BUTTON_ID;
-    button.style.cssText = `
-    font-family: "Roboto","Arial",sans-serif;
-    font-weight: 500;
-    margin-left: 8px;
-    padding: 6px 12px;
-    background-color: ${isSaved ? '#444' : '#065fd4'};
-    color: ${isSaved ? '#d4d2d2' : 'white'};
-    border-radius: 80%;
-    border: none;
-    cursor: ${isSaved ? 'auto' : 'pointer'};
-    font-size: 14px;
-  `;
-
-    updateButtonState(button, isSaved);
+    injectYouTubeButtonStyles();
+    button = createYTbutton({
+      id: BUTTON_ID,
+      icon: heart,
+      activeIcon: heartAdded,
+      tooltip: 'Favorite Local playlist',
+      activeTooltip: 'Add to local',
+    });
 
     button.addEventListener('click', () => {
       console.log('[Injector] User clicked add');
@@ -47,7 +110,7 @@ function renderButton(isSaved: boolean) {
       const thumbImg = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
       const video = { id, title, url, thumbImg, addedAt: Date.now() };
-
+      console.log({ video });
       // Notify contentScript to store the video
       window.postMessage(
         {
@@ -59,7 +122,9 @@ function renderButton(isSaved: boolean) {
       );
     });
 
-    container.appendChild(button);
+    updateButtonState(button, isSaved, heartAdded, heart);
+
+    container.prepend(button);
   });
 }
 
@@ -79,23 +144,28 @@ function waitForContainer(cb: (el: HTMLElement) => void) {
   tryFind();
 }
 
-function updateButtonState(btn: HTMLButtonElement, isSaved: boolean) {
-  const heart = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-</svg>
-`;
-  const heartAdded = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-  <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
-</svg>
-`;
-  console.log({ heart, heartAdded });
+function updateButtonState(
+  btn: HTMLButtonElement,
+  isSaved: boolean,
+  activeIcon: string,
+  icon: string
+) {
   console.log('[BUTTON] updating state... ', isSaved);
 
-  btn.textContent = isSaved ? 'Added' : 'Mark Fav';
-  btn.disabled = isSaved;
-  btn.style.backgroundColor = isSaved ? '#444' : '#065fd4';
-  btn.style.color = isSaved ? '#d4d2d2' : '#fff';
-  btn.style.cursor = isSaved ? 'auto' : 'pointer';
+  btn.innerHTML = `<span class="yt-icon" style="width: 100%;height: 26px;">${
+    isSaved ? activeIcon : icon
+  }</span>`;
+  btn.title = isSaved ? 'Add to Local' : 'Favorite Local playlist';
+  btn.style.color = isSaved ? '#fff' : '#fff';
+
+  if (isSaved) {
+    // retrigger animation safely
+    btn.classList.remove('yt-like-animate');
+    btn.classList.remove('yt-icon-fill');
+    void btn.offsetWidth; // force reflow (important)
+    btn.classList.add('yt-like-animate');
+    btn.classList.add('yt-icon-fill');
+  }
 }
 
 /**
@@ -127,6 +197,39 @@ window.addEventListener('message', (ev) => {
  * When popup triggers add_video, mimic a click on the YT button
  */
 function simulateClick() {
+  // Track current state
+  const BUTTON_ID = 'ytps-fav-btn';
+  let button: HTMLButtonElement | null = document.getElementById(
+    BUTTON_ID
+  ) as HTMLButtonElement;
+
   if (!button) return;
   button.click();
+}
+
+// -----------------------------------
+// Styles on Animation
+// -----------------------------------
+function injectYouTubeButtonStyles() {
+  if (document.getElementById('yt-fav-btn-styles')) return;
+
+  const style = document.createElement('style');
+  style.id = 'yt-fav-btn-styles';
+  style.textContent = `
+    @keyframes yt-like-pop {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.15); }
+      55%  { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+
+    .yt-like-animate {
+      animation: yt-like-pop 210ms cubic-bezier(0.74, -0.07, 0.23, 1.07);
+    }
+
+    .yt-icon-fill {
+      transition: fill 250ms ease-in-out;
+    }
+  `;
+  document.head.appendChild(style);
 }

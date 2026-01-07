@@ -3,9 +3,14 @@ import { sendToBackground } from '../../utils/actions/messages';
 
 export const Popup = () => {
   const openSidePanel = async () => {
-    // FIXME: Related to the side_panel view - TODO - only show in yt tabs
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab.id) {
+      const { enabled } = await chrome.sidePanel.getOptions({ tabId: tab.id });
+      if (!enabled) {
+        console.info(`Current tab does not have side-panel enabled - tab.id: ${tab.id}`);
+        return;
+      }
+
       await sendToBackground({
         type: cs.OPEN_PANEL,
         payload: { currentTab: tab },

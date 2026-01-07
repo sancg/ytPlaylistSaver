@@ -1,53 +1,54 @@
 import { cs } from '../shared/constants';
+import { handleTabState } from './handleStatePanel';
+import { checkCommandShortcuts } from './commands';
 import type { StoragePlaylist, Video } from '../../types/video';
 
 console.log('[Background] Ready...');
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+    checkCommandShortcuts();
+  }
+});
+
+chrome.commands.onCommand.addListener(async (cmd) => {
+  //FIXME: The error is still the same when querying for the current tab. Uncaught (in promise) Error: `sidePanel.open()` may only be called in response to a user gesture.
+  if (cmd === 'toggle-side-panel') {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab.id) {
+      const { enabled } = await chrome.sidePanel.getOptions({ tabId: tab.id });
+      if (!enabled) {
+        console.info(`Current tab does not have side-panel enabled - tab.id: ${tab.id}`);
+        return;
+      }
+      await chrome.sidePanel.open({ tabId: tab.id });
+    }
+  }
+});
+
 // NOTE: Open the SidePanel only in the YT tabs... see the docs.
 // https://github.com/GoogleChrome/chrome-extensions-samples/blob/main/functional-samples/cookbook.sidepanel-site-specific/service-worker.js
-// It is fix when is in the same tab, I've should look into the set up better.
 // Detecting tab URL changes
 let tabUrl: string = '';
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
-  if (!tab.url) return;
+  if (!tab.url || !info.url) return;
   tabUrl = tab.url;
+  await handleTabState(tabId, tabUrl, 'onUpdated');
 
-  // Check tab focus
-  if (!tab.active) {
-    console.log('[BG] tab out of focus?', { tab, info });
+  if (info.url.includes(cs.ORIGIN)) {
+    await chrome.tabs.sendMessage(tabId, { action: 'url_change', payload: { tab } });
   }
+});
 
-  if (info.status === 'complete') {
-    if (info.title) {
-      console.log('[BG] Complete change - Render just one button');
-    }
-    const url = new URL(tab.url);
-    // Check URL changes to update state on the UI -> M.W.
-    if (url.href.includes(cs.ORIGIN)) {
-      console.log({ info, tab, tabUrl, url: tab.url });
-      if (tabId === tab.id) {
-        console.log('[BG] Detecting change on the URL....');
-        await chrome.tabs.sendMessage(tabId, {
-          action: 'url_change',
-          payload: { updatedUrl: tab.url },
-        });
-      }
-      await chrome.sidePanel.setOptions({
-        tabId: tab.id,
-        path: 'src/pages/side_panel/side-panel.html',
-        enabled: true,
-      });
-    } else {
-      await chrome.sidePanel.setOptions({ tabId: tab.id, enabled: false });
-    }
-  }
+chrome.tabs.onActivated.addListener(async ({ tabId }) => {
+  const tab = await chrome.tabs.get(tabId);
+  if (!tab.url) return;
+
+  handleTabState(tabId, tab.url, 'onActivated');
 });
 
 chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
   if (res.type === cs.OPEN_PANEL) {
     const { id } = res.payload.currentTab;
-    // Intended to allow sidePanel if the URL is different from cs.ORIGIN
-    // console.log({ tabUrl, sender, currentTab: url });
-
     (async () => {
       await chrome.sidePanel.open({ tabId: id });
     })();
