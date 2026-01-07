@@ -18,7 +18,7 @@ titleObserver.observe(document.querySelector('title')!, {
 
 // Handle injection button on navigation changes
 async function handleNavigation() {
-  console.log('[ContentScript] Navigation detected.');
+  console.log('[CS] Navigation detected.');
 
   const videoId = new URL(location.href).searchParams.get('v');
   if (!videoId) return;
@@ -49,8 +49,7 @@ chrome.runtime.onMessage.addListener((req, _sender, sendResponse) => {
   }
 
   if (req.action === 'add_video') {
-    console.log('ALSO TRIGGERED BY ACCIDENT?');
-    console.log('CS adding video... ', { req });
+    console.log('[CS] action: add_video triggered ', { req });
     injectAddVideo();
     return true;
   }
@@ -70,7 +69,7 @@ chrome.runtime.onMessage.addListener((req, _sender, sendResponse) => {
 
 // Ask injector script to add the current video
 function injectAddVideo() {
-  console.log('[ContentScript] Add video fired up');
+  console.log('[CS] Add video fired up');
   window.postMessage({ source: 'ytps-content', type: 'add_video' }, '*');
 }
 
