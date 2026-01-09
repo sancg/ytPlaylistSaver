@@ -1,29 +1,18 @@
 import buildContentPlaylist from './yt_api/buildPlayList';
 console.log('[ContentScript] Loaded...');
 
-// Mutation Observer - Detecting YT navigation
-let lastUrl = location.href;
-const titleObserver = new MutationObserver(() => {
-  console.log({ nowUrl: location.href, lastUrl });
-  if (location.href !== lastUrl) {
-    lastUrl = location.href;
-    handleNavigation();
-  }
-});
-
-titleObserver.observe(document.querySelector('title')!, {
-  childList: true,
-  subtree: true,
-});
+let currentVideoId: string | null = null;
+void handleNavigation(location.href);
 
 // Handle injection button on navigation changes
-async function handleNavigation() {
-  const videoId = new URL(location.href).searchParams.get('v');
+async function handleNavigation(url: string) {
+  const nextId = new URL(url).searchParams.get('v');
 
-  console.log('[CS] Navigation detected.', { videoId });
-  if (!videoId) return;
+  console.log('[CS] Navigation detected.', { nextId });
+  if (!nextId || nextId === currentVideoId) return;
+  currentVideoId = nextId;
 
-  const msg = { type: 'is_saved', payload: { currentId: videoId } };
+  const msg = { type: 'is_saved', payload: { currentId: nextId } };
   // Ask background if video is saved
   const res = await chrome.runtime.sendMessage(msg);
 
@@ -33,7 +22,7 @@ async function handleNavigation() {
       source: 'ytps-content',
       type: 'update_state',
       exists: res.exists,
-      videoId,
+      videoId: currentVideoId,
     },
     '*'
   );
@@ -43,9 +32,9 @@ async function handleNavigation() {
 // ----------------------------
 chrome.runtime.onMessage.addListener((req, _sender, sendResponse) => {
   if (req.action === 'url_change') {
+    const url = req.payload.tab.url;
     console.log('[CS] action: "url_change"; Reading message from the BG worker...', { req });
-    handleNavigation(); // weird that an async function could be called even if it is not processed?
-    return { success: true };
+    void handleNavigation(url);
   }
 
   if (req.action === 'add_video') {
