@@ -32,17 +32,29 @@ let tabUrl: string = '';
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (!tab.url || !info.url) return;
   tabUrl = tab.url;
-  await handleTabState(tabId, tabUrl, 'onUpdated');
-
-  if (info.url.includes(cs.ORIGIN)) {
-    await chrome.tabs.sendMessage(tabId, { action: 'url_change', payload: { tab } });
+  if (tabUrl.includes(cs.ORIGIN)) {
+    console.log('[BG] Sending message of tab onUpdated', { info, tab });
+    try {
+      await chrome.tabs.sendMessage(tabId, { action: 'url_change', payload: { tab } });
+    } catch (error) {
+      console.info('onUpdated: cs is not available', error);
+    }
   }
+  handleTabState(tabId, tabUrl, 'onUpdated');
 });
 
 chrome.tabs.onActivated.addListener(async ({ tabId }) => {
   const tab = await chrome.tabs.get(tabId);
   if (!tab.url) return;
 
+  if (tab.url.includes(cs.ORIGIN)) {
+    console.log('[BG] Sending message of tab onActivated', { tab });
+    try {
+      await chrome.tabs.sendMessage(tabId, { action: 'url_change', payload: { tab } });
+    } catch (error) {
+      console.info('onActivated: cs is not available - ', error);
+    }
+  }
   handleTabState(tabId, tab.url, 'onActivated');
 });
 
