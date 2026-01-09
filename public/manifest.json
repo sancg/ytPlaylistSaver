@@ -1,26 +1,47 @@
 {
   "manifest_version": 3,
   "name": "Playlist Saver",
-  "version": "1.0.0",
-  "description": "YouTube Playlist saver in a local file",
+  "version": "1.2.0",
+  "description": "TY Playlist saver for local downloads and retrieval",
   "action": {
-    "default_popup": "/html/index.html",
-    "default_icon": "dw_v3.3.png"
+    "default_popup": "src/pages/popup/popup.html",
+    "default_icon": "assets/icons/dw_v3.3.png"
   },
-  "options_page": "/html/pages/playlist_viewer.html",
-  "permissions": ["tabs", "scripting", "storage", "tabGroups"],
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
-      "js": ["/assets/app/contentScript.js"]
+      "js": [
+        "/assets/app/scripts/content/contentScript.js",
+        "/assets/app/scripts/content/contentFavButton.js"
+      ]
     }
   ],
+  "background": {
+    "service_worker": "/assets/app/scripts/background/background.js",
+    "type": "module"
+  },
   "web_accessible_resources": [
     {
-      "resources": ["assets/iframe_api.js", "html/pages/playlist_viewer.html", "assets/*"],
-      "matches": ["<all_urls>"]
+      "resources": ["public/html/pages/playlist_viewer.html", "assets/*"],
+      "matches": ["*://*.youtube.com/*"]
     }
   ],
+  "permissions": ["tabs", "scripting", "storage", "sidePanel", "downloads"],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+B",
+        "mac": "Command+B"
+      }
+    },
+    "toggle-side-panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+P",
+        "mac": "Ctrl+Shift+P"
+      },
+      "description": "toggle sidePanel view"
+    }
+  },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com;"
   }
