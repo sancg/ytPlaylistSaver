@@ -37,8 +37,9 @@ function createYTbutton({
   btn.style.alignItems = 'center';
   btn.style.justifyContent = 'center';
   btn.style.width = '40px';
+  btn.style.height = '36px';
   btn.style.marginRight = '8px';
-  btn.style.borderRadius = '50%';
+  btn.style.borderRadius = '1.5rem';
   btn.style.cursor = 'pointer';
   btn.style.color = '#fff';
   btn.style.background = 'rgba(255,255,255,0.1)';
@@ -98,8 +99,8 @@ function renderButton(isSaved: boolean) {
       id: BUTTON_ID,
       icon: heart,
       activeIcon: heartAdded,
-      tooltip: 'Favorite Local playlist',
-      activeTooltip: 'Add to local',
+      tooltip: 'Add to local',
+      activeTooltip: 'Favorite Local playlist',
     });
 
     button.addEventListener('click', () => {
@@ -161,10 +162,10 @@ function updateButtonState(
   if (isSaved) {
     // retrigger animation safely
     btn.classList.remove('yt-like-animate');
-    btn.classList.remove('yt-icon-fill');
+    btn.classList.remove('yt-icon-color');
     void btn.offsetWidth; // force reflow (important)
     btn.classList.add('yt-like-animate');
-    btn.classList.add('yt-icon-fill');
+    btn.classList.add('yt-icon-color');
   }
 }
 
@@ -227,8 +228,8 @@ function injectYouTubeButtonStyles() {
       animation: yt-like-pop 210ms cubic-bezier(0.74, -0.07, 0.23, 1.07);
     }
 
-    .yt-icon-fill {
-      transition: fill 250ms ease-in-out;
+    .yt-icon-color {
+      transition: color 250ms ease-in-out;
     }
   `;
   document.head.appendChild(style);
