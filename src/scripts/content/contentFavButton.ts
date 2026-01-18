@@ -1,4 +1,4 @@
-const YTPS_Injector = (() => {
+(() => {
   // TYPES
   // --------------------------
   interface VideoStateEvent {
@@ -193,7 +193,7 @@ const YTPS_Injector = (() => {
     if (msg.type === 'update_state') {
       const { exists } = msg as VideoStateEvent;
       console.log('[BUTTON] Event received from CS as: ', exists);
-      YTPS_Injector.renderButton(exists);
+      renderButton(exists);
     }
 
     // contentScript → injector : user clicked “add” inside popup
@@ -252,5 +252,3 @@ const YTPS_Injector = (() => {
     renderButton,
   };
 })();
-
-void YTPS_Injector;
