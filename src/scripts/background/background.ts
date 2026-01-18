@@ -52,6 +52,9 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
     try {
       await chrome.tabs.sendMessage(tabId, { action: 'url_change', payload: { tab } });
     } catch (error) {
+      // FIXME: This error occurs when [CS] is not available at the time of execution
+      // 1. Implement a debounce when sendMessage()
+      // 2. Ensure injection via chrome.scripting.executeScript() or similar
       console.info('onActivated: cs is not available - ', error);
     }
   }

@@ -31,29 +31,39 @@ async function handleNavigation(url: string) {
 // Listen to extension messages
 // ----------------------------
 chrome.runtime.onMessage.addListener((req, _sender, sendResponse) => {
-  if (req.action === 'url_change') {
-    const url = req.payload.tab.url;
-    console.log('[CS] action: "url_change"; Reading message from the BG worker...', { req });
-    void handleNavigation(url);
+  if (!req.action) {
+    console.log('No action available', req);
+    return;
   }
 
-  if (req.action === 'add_video') {
-    console.log('[CS] action: add_video triggered ', { req });
-    injectAddVideo();
-    return true;
-  }
+  console.log(`[CS] action registered: `, req);
+  switch (req.action) {
+    case 'url_change':
+      const url = req.payload.tab.url; // Info received from BG
+      void handleNavigation(url);
+      break;
 
-  if (req.action === 'extract_playlist') {
-    (async () => {
-      const { playlist, skipVideos, error } = await buildContentPlaylist(document);
-      sendResponse({ playlist, skipVideos, error });
-    })();
-    console.log('[CS] scraping completed...');
-    // return true keeps the message port open for async sendResponse()
-    return true;
-  }
+    case 'add_video':
+      injectAddVideo();
+      return true;
 
-  return { success: true };
+    case 'extract_playlist':
+      (async () => {
+        try {
+          const result = await buildContentPlaylist(document);
+          sendResponse(result);
+        } catch (error) {
+          console.error('[CS] extraction failed', error);
+          sendResponse({ playlist: [], skipVideos: [], error: String(error) });
+        }
+      })();
+
+      return true;
+
+    default:
+      console.info('Action not registered', req.action);
+      return { success: true };
+  }
 });
 
 // Ask injector script to add the current video
