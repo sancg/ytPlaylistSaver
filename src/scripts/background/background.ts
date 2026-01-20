@@ -62,15 +62,6 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
 });
 
 chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
-  if (res.type === cs.OPEN_PANEL) {
-    const { id } = res.payload.currentTab;
-    (async () => {
-      await chrome.sidePanel.open({ tabId: id });
-    })();
-
-    return true;
-  }
-
   if (res.type === cs.IS_SAVED) {
     const cID = res.payload.currentId;
     chrome.storage.local.get('download-ready').then((sg) => {

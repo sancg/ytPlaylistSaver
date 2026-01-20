@@ -1,5 +1,5 @@
-import { cs } from '../../scripts/shared/constants';
-import { sendToBackground } from '../../utils/actions/messages';
+// import { cs } from '../../scripts/shared/constants';
+// import { sendToBackground } from '../../utils/actions/messages';
 
 export const Popup = () => {
   const openSidePanel = async () => {
@@ -11,10 +11,7 @@ export const Popup = () => {
         return;
       }
 
-      await sendToBackground({
-        type: cs.OPEN_PANEL,
-        payload: { currentTab: tab },
-      });
+      await chrome.sidePanel.open({ tabId: tab.id });
     }
   };
 
