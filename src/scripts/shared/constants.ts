@@ -6,10 +6,16 @@ export const cs = {
   GET_VIDEOS: 'get_videos',
   AVAILABLE_LIST: 'get_keys',
   REMOVE_VIDEO: 'remove_video',
-  OPEN_PANEL: 'open_local_panel',
+  ALLOWED_EXTENSION: (url?: string) => {
+    if (!url) return false;
 
-  // Workers dir:
-  PYODIDE_DIR: 'assets/app/scripts/background/py_worker/py-worker.js',
+    try {
+      const u = new URL(url);
+      return u.hostname.includes('youtube.com') && u.pathname === '/watch';
+    } catch {
+      return false;
+    }
+  },
 } as const;
 
 export type MessageType = (typeof cs)[keyof typeof cs];
