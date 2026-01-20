@@ -75,7 +75,7 @@
     // Track current state
     const BUTTON_ID = 'ytps-fav-btn';
     let button: HTMLButtonElement | null = document.getElementById(
-      BUTTON_ID
+      BUTTON_ID,
     ) as HTMLButtonElement;
 
     const heart = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -124,7 +124,7 @@
             action: 'add_video',
             payload: { video },
           },
-          '*'
+          '*',
         );
       });
 
@@ -140,7 +140,7 @@
   function waitForContainer(cb: (el: HTMLElement) => void) {
     const tryFind = () => {
       const container = document.querySelector<HTMLElement>(
-        '#actions #actions-inner > #menu > ytd-menu-renderer'
+        '#actions #actions-inner > #menu > ytd-menu-renderer',
       );
 
       if (container) {
@@ -157,7 +157,7 @@
     btn: HTMLButtonElement,
     isSaved: boolean,
     activeIcon: string,
-    icon: string
+    icon: string,
   ) {
     console.log('[BUTTON] updating state... ', isSaved);
 
@@ -210,7 +210,7 @@
     // Track current state
     const BUTTON_ID = 'ytps-fav-btn';
     let button: HTMLButtonElement | null = document.getElementById(
-      BUTTON_ID
+      BUTTON_ID,
     ) as HTMLButtonElement;
 
     if (!button) return;
@@ -244,11 +244,4 @@
   `;
     document.head.appendChild(style);
   }
-
-  // ----------------------------
-  // Public API (ONE symbol)
-  // ----------------------------
-  return {
-    renderButton,
-  };
 })();
