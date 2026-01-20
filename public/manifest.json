@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Playlist Saver",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "TY Playlist saver for local downloads and retrieval",
   "action": {
     "default_popup": "src/pages/popup/popup.html",
