@@ -24,7 +24,7 @@ async function handleNavigation(url: string) {
       exists: res.exists,
       videoId: currentVideoId,
     },
-    '*'
+    '*',
   );
 }
 // ----------------------------
@@ -89,7 +89,7 @@ window.addEventListener('message', (ev) => {
           exists: r.exists,
         };
         console.log('[CS] sending back to button [Real World]...', msg);
-        window.postMessage(msg); // The contentFavButton receives the update
+        window.postMessage(msg); // The inject button receives the update
       });
   }
 });

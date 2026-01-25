@@ -3,9 +3,17 @@ type Video = {
   title: string;
   url: string;
   thumbImg: string;
+  thumbnailList?: ThumbList[];
   publishedBy?: string;
   timeLength?: string;
   currentIndex?: boolean;
+  addedAt?: number;
+};
+
+type ThumbList = {
+  url: string;
+  height: number;
+  width: number;
 };
 
 interface GetPlaylistCall {
@@ -16,4 +24,4 @@ interface GetPlaylistCall {
 
 type StoragePlaylist = { [key: string]: Video[] };
 
-export { Video, GetPlaylistCall, StoragePlaylist };
+export { Video, ThumbList, GetPlaylistCall, StoragePlaylist };

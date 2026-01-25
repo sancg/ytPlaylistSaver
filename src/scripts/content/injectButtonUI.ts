@@ -1,6 +1,9 @@
+import { ThumbList, Video } from '../../types/video';
+
 (() => {
+  // -------------------------
   // TYPES
-  // --------------------------
+  // -------------------------
   interface VideoStateEvent {
     source: 'ytps-content';
     type: 'update_state';
@@ -18,8 +21,9 @@
     onClick?: () => void;
   };
 
+  // --------------------------
   // Button Factory
-  // -------------------------
+  // --------------------------
   function createYTbutton({
     id,
     icon,
@@ -59,6 +63,7 @@
 
     if (onClick) {
       btn.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
         onClick();
       });
@@ -66,8 +71,36 @@
     return btn;
   }
 
+  // Styles on Animation
+  // -----------------------------------
+  function injectYouTubeButtonStyles() {
+    if (document.getElementById('yt-fav-btn-styles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'yt-fav-btn-styles';
+    style.textContent = `
+    @keyframes yt-like-pop {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.15); }
+      55%  { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+
+    .yt-like-animate {
+      animation: yt-like-pop 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .yt-icon-color {
+      border: 1px solid #3f3f3f !important;
+      transition: color 250ms ease-in-out;
+    }
+  `;
+    document.head.appendChild(style);
+  }
+
+  // --------------------------------
   // Render logic
-  // -------------------------------
+  // --------------------------------
   /**
    * Renders the button style and update its state depending on the events send by [CS]
    */
@@ -105,36 +138,15 @@
         tooltip: 'Add to local',
       });
 
-      button.addEventListener('click', () => {
-        console.log('[Injector] User clicked add');
-        const url = location.href;
-        const title = document.querySelector('h1.ytd-watch-metadata')?.textContent?.trim();
-        const id = new URL(url).searchParams.get('v');
-        const thumbImg = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-        const publishedBy = document
-          .querySelector('#channel-name div.ytd-channel-name a')
-          ?.textContent?.trim();
-
-        const video = { id, title, url, thumbImg, publishedBy, addedAt: Date.now() };
-
-        // Notify contentScript to store the video
-        window.postMessage(
-          {
-            source: 'ytps-injector',
-            action: 'add_video',
-            payload: { video },
-          },
-          '*',
-        );
-      });
-
       console.log('[BUTTON] First injection button: ', { button, isSaved });
       updateButtonState(button, isSaved, heartAdded, heart);
-
       container.prepend(button);
+
+      button.addEventListener('click', sendVideoMessage);
     });
   }
 
+  // ----------------------------------
   // Helpers
   // ----------------------------------
   function waitForContainer(cb: (el: HTMLElement) => void) {
@@ -174,8 +186,78 @@
       void btn.offsetWidth; // force reflow (important)
       btn.classList.add('yt-like-animate');
       btn.classList.add('yt-icon-color');
+      btn.removeEventListener('click', sendVideoMessage);
+    } else {
+      btn.addEventListener('click', sendVideoMessage);
     }
   }
+
+  const sendVideoMessage = async () => {
+    const url = window.location.href;
+    const id = new URL(url).searchParams.get('v');
+    let video: Video = { id: id!, url, title: '', thumbImg: '' };
+
+    console.log('[BUTTON] Get single video');
+    const meta = await getVideoMetaData(id!);
+    if (meta) {
+      video = meta;
+    } else {
+      console.log(`[BUTTON] Fallback to DOM extraction`);
+      video = getVideoFromDOM(id!);
+    }
+
+    // Notify contentScript to store the video
+    window.postMessage(
+      {
+        source: 'ytps-injector',
+        action: 'add_video',
+        payload: { video },
+      },
+      '*',
+    );
+  };
+
+  const getVideoFromDOM = (id: string): Video => {
+    const url = location.href;
+    const title = document.querySelector('h1.ytd-watch-metadata')?.textContent?.trim() || '';
+    const thumbImg = `https://i.ytimg.com/vi/${id}/hqdefault.jpg` || '';
+    const publishedBy = document
+      .querySelector('#channel-name div.ytd-channel-name a')
+      ?.textContent?.trim();
+
+    return { id, title, url, thumbImg, publishedBy, addedAt: Date.now() };
+  };
+
+  const getVideoMetaData = async (videoId: string) => {
+    let video: Video = { id: videoId, title: '', url: '', thumbImg: '' };
+    try {
+      const req = await fetch(`https://www.youtube.com/watch?v=${videoId}`);
+      const html = await req.text();
+
+      const playerMatch = html.match(/var ytInitialPlayerResponse = ({.+?});/);
+      if (!playerMatch) return null;
+
+      // Extraction ---------------
+      const { videoDetails } = JSON.parse(playerMatch[1]);
+      const thumbs: ThumbList[] = videoDetails.thumbnail.thumbnails;
+
+      video.title = videoDetails.title;
+      video.url = `https://www.youtube.com/watch?v=${videoId}`;
+      video.publishedBy = videoDetails.author;
+      video.thumbImg = thumbs[0].url;
+      video.thumbnailList = thumbs;
+
+      const lengthSeconds = videoDetails.lengthSeconds;
+      const SEC = lengthSeconds % 60;
+      const MIN = (lengthSeconds - SEC) / 60;
+      video.timeLength = `${MIN}:${SEC}`;
+    } catch (err) {
+      console.warn(`[VIDEO META] Something happen on the "wt" request: ${err}`);
+      return null;
+    }
+
+    return video;
+  };
 
   // ----------------------------
   // Message Listener
@@ -215,33 +297,5 @@
 
     if (!button) return;
     button.click();
-  }
-
-  // -----------------------------------
-  // Styles on Animation
-  // -----------------------------------
-  function injectYouTubeButtonStyles() {
-    if (document.getElementById('yt-fav-btn-styles')) return;
-
-    const style = document.createElement('style');
-    style.id = 'yt-fav-btn-styles';
-    style.textContent = `
-    @keyframes yt-like-pop {
-      0%   { transform: scale(1); }
-      30%  { transform: scale(1.15); }
-      55%  { transform: scale(0.95); }
-      100% { transform: scale(1); }
-    }
-
-    .yt-like-animate {
-      animation: yt-like-pop 300ms cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .yt-icon-color {
-      border: 1px solid #3f3f3f !important;
-      transition: color 250ms ease-in-out;
-    }
-  `;
-    document.head.appendChild(style);
   }
 })();

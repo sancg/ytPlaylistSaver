@@ -12,7 +12,7 @@
       "matches": ["*://*.youtube.com/*"],
       "js": [
         "/assets/app/scripts/content/contentScript.js",
-        "/assets/app/scripts/content/contentFavButton.js"
+        "/assets/app/scripts/content/injectButtonUI.js"
       ]
     }
   ],
