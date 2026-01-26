@@ -11,7 +11,7 @@ export const cs = {
 
     try {
       const u = new URL(url);
-      return u.hostname.includes('youtube.com') && u.pathname === '/watch';
+      return u.hostname.includes('youtube.com');
     } catch {
       return false;
     }
