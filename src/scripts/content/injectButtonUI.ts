@@ -4,12 +4,12 @@ import { ThumbList, Video } from '../../types/video';
   // -------------------------
   // TYPES
   // -------------------------
-  interface VideoStateEvent {
+  type VideoStateEvent = {
     source: 'ytps-content';
     type: 'update_state';
     exists: boolean;
     videoId: string;
-  }
+  };
 
   type YoutubeButtonOpts = {
     id: string;
@@ -24,6 +24,16 @@ import { ThumbList, Video } from '../../types/video';
   // --------------------------
   // Button Factory
   // --------------------------
+  const heart = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+</svg>
+`;
+
+  const heartAdded = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+  <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+</svg>
+`;
+
   function createYTbutton({
     id,
     icon,
@@ -98,28 +108,28 @@ import { ThumbList, Video } from '../../types/video';
     document.head.appendChild(style);
   }
 
+  function animationTrigger(btn: HTMLButtonElement) {
+    // retrigger animation safely
+    btn.classList.remove('yt-like-animate');
+    btn.classList.remove('yt-icon-color');
+    void btn.offsetWidth; // force reflow (important)
+    btn.classList.add('yt-like-animate');
+    btn.classList.add('yt-icon-color');
+  }
+
   // --------------------------------
   // Render logic
   // --------------------------------
   /**
    * Renders the button style and update its state depending on the events send by [CS]
    */
+
   function renderButton(isSaved: boolean) {
     // Track current state
     const BUTTON_ID = 'ytps-fav-btn';
     let button: HTMLButtonElement | null = document.getElementById(
       BUTTON_ID,
     ) as HTMLButtonElement;
-
-    const heart = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-</svg>
-`;
-
-    const heartAdded = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-  <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
-</svg>
-`;
 
     // If button exists, update it
     if (button) {
@@ -138,11 +148,25 @@ import { ThumbList, Video } from '../../types/video';
         tooltip: 'Add to local',
       });
 
-      console.log('[BUTTON] First injection button: ', { button, isSaved });
-      updateButtonState(button, isSaved, heartAdded, heart);
-      container.prepend(button);
+      button.onclick = async () => {
+        try {
+          button!.innerHTML = `<span class="yt-icon" style="width: 100%;height: 26px;">${
+            heartAdded
+          }</span>`;
+          button!.title = 'Saved on Local';
+          button!.style.color = '#fff';
+          animationTrigger(button!);
+          button!.disabled = true;
+          await sendVideoMessage(button!, false);
+        } catch (error) {
+          console.error(`[BUTTON] Error while getting metadata: ${error}`);
+        } finally {
+          button!.disabled = false;
+        }
+      };
 
-      button.addEventListener('click', sendVideoMessage);
+      console.log('[BUTTON] First injection button: ', { button, isSaved });
+      container.prepend(button);
     });
   }
 
@@ -171,51 +195,53 @@ import { ThumbList, Video } from '../../types/video';
     activeIcon: string,
     icon: string,
   ) {
-    console.log('[BUTTON] updating state... ', isSaved);
+    btn.onclick = async () => await sendVideoMessage(btn, isSaved);
 
     btn.innerHTML = `<span class="yt-icon" style="width: 100%;height: 26px;">${
       isSaved ? activeIcon : icon
     }</span>`;
     btn.title = isSaved ? 'Saved on Local' : 'Add to Local';
     btn.style.color = isSaved ? '#fff' : '#fff';
-
-    if (isSaved) {
-      // retrigger animation safely
-      btn.classList.remove('yt-like-animate');
-      btn.classList.remove('yt-icon-color');
-      void btn.offsetWidth; // force reflow (important)
-      btn.classList.add('yt-like-animate');
-      btn.classList.add('yt-icon-color');
-      btn.removeEventListener('click', sendVideoMessage);
-    } else {
-      btn.addEventListener('click', sendVideoMessage);
-    }
   }
 
-  const sendVideoMessage = async () => {
-    const url = window.location.href;
-    const id = new URL(url).searchParams.get('v');
-    let video: Video = { id: id!, url, title: '', thumbImg: '' };
-
-    console.log('[BUTTON] Get single video');
-    const meta = await getVideoMetaData(id!);
-    if (meta) {
-      video = meta;
-    } else {
-      console.log(`[BUTTON] Fallback to DOM extraction`);
-      video = getVideoFromDOM(id!);
+  // Extractor functions
+  // -----------------------------------------
+  async function sendVideoMessage(btnAction: HTMLButtonElement, active: boolean) {
+    if (active) {
+      console.log(`[BUTTON] no retrigger fetch`);
+      return;
     }
+    try {
+      animationTrigger(btnAction);
+      btnAction.disabled = true;
+      const url = window.location.href;
+      const id = new URL(url).searchParams.get('v');
+      let video: Video = { id: id!, url, title: '', thumbImg: '' };
 
-    // Notify contentScript to store the video
-    window.postMessage(
-      {
-        source: 'ytps-injector',
-        action: 'add_video',
-        payload: { video },
-      },
-      '*',
-    );
-  };
+      console.log('[BUTTON] Get single video');
+      const meta = await getVideoMetaData(id!);
+      if (meta) {
+        video = meta;
+      } else {
+        console.log(`[BUTTON] Fallback to DOM extraction`);
+        video = getVideoFromDOM(id!);
+      }
+
+      // Notify contentScript to store the video
+      window.postMessage(
+        {
+          source: 'ytps-injector',
+          action: 'add_video',
+          payload: { video },
+        },
+        '*',
+      );
+    } catch (error) {
+      console.error(`[BUTTON] Error while getting metadata -> updateStateFunc: ${error}`);
+    } finally {
+      btnAction.disabled = false;
+    }
+  }
 
   const getVideoFromDOM = (id: string): Video => {
     const url = location.href;
@@ -274,7 +300,6 @@ import { ThumbList, Video } from '../../types/video';
     // contentScript → injector : provide new video state
     if (msg.type === 'update_state') {
       const { exists } = msg as VideoStateEvent;
-      console.log('[BUTTON] Event received from CS as: ', exists);
       renderButton(exists);
     }
 
