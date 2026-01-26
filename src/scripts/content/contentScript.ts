@@ -77,7 +77,7 @@ window.addEventListener('message', (ev) => {
   if (!msg || msg.source !== 'ytps-injector') return;
 
   if (msg.action === 'add_video') {
-    console.log('[Injector] injector requested add_video: ', msg);
+    console.log('[Injector] Request action: "add_video"', msg);
 
     // Notify to the background if it could be saved
     chrome.runtime
@@ -88,8 +88,24 @@ window.addEventListener('message', (ev) => {
           type: 'update_state',
           exists: r.exists,
         };
-        console.log('[CS] sending back to button [Real World]...', msg);
+
         window.postMessage(msg); // The inject button receives the update
+      });
+  }
+  if (msg.action === 'remove_video') {
+    console.log(`[Injector] Request action: "remove_video"`, msg);
+
+    chrome.runtime
+      .sendMessage({ type: 'remove_video', payload: { id: msg.payload.id } })
+      .then((r) => {
+        const msg = {
+          source: 'ytps-content',
+          type: 'update_state',
+          exists: false,
+          payload: r,
+        };
+
+        window.postMessage(msg);
       });
   }
 });

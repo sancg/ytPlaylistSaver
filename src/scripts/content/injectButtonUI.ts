@@ -108,7 +108,15 @@ import { ThumbList, Video } from '../../types/video';
     document.head.appendChild(style);
   }
 
-  function animationTrigger(btn: HTMLButtonElement) {
+  function animationTrigger(btn: HTMLButtonElement, active: boolean) {
+    console.log({ prev: active, check: !active });
+    // Toggle Icon appearance
+    btn.innerHTML = `<span class="yt-icon" style="width: 100%;height: 26px;">${
+      !active ? heartAdded : heart
+    }</span>`;
+    btn.title = !active ? 'Saved on Local' : 'Add to Local';
+    btn.style.color = !active ? '#fff' : '#fff';
+
     // retrigger animation safely
     btn.classList.remove('yt-like-animate');
     btn.classList.remove('yt-icon-color');
@@ -149,12 +157,6 @@ import { ThumbList, Video } from '../../types/video';
       });
 
       button.onclick = async () => {
-        button!.innerHTML = `<span class="yt-icon" style="width: 100%;height: 26px;">${
-          heartAdded
-        }</span>`;
-        button!.title = 'Saved on Local';
-        button!.style.color = '#fff';
-        animationTrigger(button!);
         await sendVideoMessage(button!, isSaved);
       };
 
@@ -189,13 +191,6 @@ import { ThumbList, Video } from '../../types/video';
     icon: string,
   ) {
     btn.onclick = async () => {
-      if (!isSaved) {
-        btn.innerHTML = `<span class="yt-icon" style="width: 100%;height: 26px;">${
-          heartAdded
-        }</span>`;
-        btn.title = 'Saved on Local';
-        btn.style.color = '#fff';
-      }
       await sendVideoMessage(btn, isSaved);
     };
 
@@ -209,16 +204,28 @@ import { ThumbList, Video } from '../../types/video';
   // Extractor functions
   // -----------------------------------------
   async function sendVideoMessage(btnAction: HTMLButtonElement, active: boolean) {
-    if (active) {
-      console.log(`[BUTTON] no retrigger fetch`);
-      return;
-    }
+    const url = window.location.href;
+    const id = new URL(url).searchParams.get('v');
+    animationTrigger(btnAction, active);
+
     try {
-      animationTrigger(btnAction);
-      btnAction.disabled = true;
-      const url = window.location.href;
-      const id = new URL(url).searchParams.get('v');
       let video: Video = { id: id!, url, title: '', thumbImg: '' };
+      btnAction.disabled = true;
+
+      if (active) {
+        console.log(`[BUTTON] Removing video from store`);
+        // Notify contentScript to store the video
+        window.postMessage(
+          {
+            source: 'ytps-injector',
+            action: 'remove_video',
+            payload: { id },
+          },
+          '*',
+        );
+
+        return;
+      }
 
       console.log('[BUTTON] Get single video');
       const meta = await getVideoMetaData(id!);
@@ -241,7 +248,7 @@ import { ThumbList, Video } from '../../types/video';
     } catch (error) {
       console.error(`[BUTTON] Error while getting metadata -> updateStateFunc: ${error}`);
     } finally {
-      btnAction.disabled = false;
+      btnAction.disabled = false; // NOTE: Would this be trigger if we have an early return?
     }
   }
 
@@ -302,6 +309,7 @@ import { ThumbList, Video } from '../../types/video';
     // contentScript → injector : provide new video state
     if (msg.type === 'update_state') {
       const { exists } = msg as VideoStateEvent;
+      console.log(msg.payload);
       renderButton(exists);
     }
 

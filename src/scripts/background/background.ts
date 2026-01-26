@@ -82,10 +82,10 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
     chrome.storage.local.get('download-ready').then((st) => {
       const video = res.payload.video;
       if (!video) {
-        console.log('[EARLY RETURN]');
+        console.log('[BG] No id provided on payload');
         sendResponse({ error: 'no video provided on payload' });
       }
-      console.log({ video, res });
+
       const list: Video[] = st['download-ready'] || [];
       const exists = list.some((v) => {
         if (!v.id) {
@@ -99,6 +99,29 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
       chrome.storage.local.set({ 'download-ready': list });
 
       sendResponse({ exists: true });
+    });
+    return true;
+  }
+
+  if (res.type === cs.REMOVE_VIDEO) {
+    chrome.storage.local.get('download-ready').then((st) => {
+      const id = res.payload.id;
+      if (!id) {
+        console.warn(`[BG] No id provided on payload`);
+        sendResponse({ error: 'No id provided on payload' });
+      }
+
+      const list: Video[] = st['download-ready'] || [];
+      const updateList = list.filter((v) => v.id !== id);
+      console.log(`Updated List: `, { list, updateList });
+
+      chrome.storage.local.set({ 'download-ready': updateList }, () => {
+        if (chrome.runtime.lastError) {
+          console.error(`[BG] Storage couldn't be updated`, chrome.runtime.lastError);
+          sendResponse({ error: "[BG] Storage couldn't be updated" });
+        }
+      });
+      sendResponse({ exists: false, payload: updateList });
     });
     return true;
   }
