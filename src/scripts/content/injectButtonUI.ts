@@ -149,20 +149,13 @@ import { ThumbList, Video } from '../../types/video';
       });
 
       button.onclick = async () => {
-        try {
-          button!.innerHTML = `<span class="yt-icon" style="width: 100%;height: 26px;">${
-            heartAdded
-          }</span>`;
-          button!.title = 'Saved on Local';
-          button!.style.color = '#fff';
-          animationTrigger(button!);
-          button!.disabled = true;
-          await sendVideoMessage(button!, false);
-        } catch (error) {
-          console.error(`[BUTTON] Error while getting metadata: ${error}`);
-        } finally {
-          button!.disabled = false;
-        }
+        button!.innerHTML = `<span class="yt-icon" style="width: 100%;height: 26px;">${
+          heartAdded
+        }</span>`;
+        button!.title = 'Saved on Local';
+        button!.style.color = '#fff';
+        animationTrigger(button!);
+        await sendVideoMessage(button!, isSaved);
       };
 
       console.log('[BUTTON] First injection button: ', { button, isSaved });
@@ -195,7 +188,16 @@ import { ThumbList, Video } from '../../types/video';
     activeIcon: string,
     icon: string,
   ) {
-    btn.onclick = async () => await sendVideoMessage(btn, isSaved);
+    btn.onclick = async () => {
+      if (!isSaved) {
+        btn.innerHTML = `<span class="yt-icon" style="width: 100%;height: 26px;">${
+          heartAdded
+        }</span>`;
+        btn.title = 'Saved on Local';
+        btn.style.color = '#fff';
+      }
+      await sendVideoMessage(btn, isSaved);
+    };
 
     btn.innerHTML = `<span class="yt-icon" style="width: 100%;height: 26px;">${
       isSaved ? activeIcon : icon
