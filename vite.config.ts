@@ -17,7 +17,7 @@ export default defineConfig({
 
         // scripts
         contentScript: resolve(__dirname, 'src/scripts/content/contentScript.ts'),
-        contentFavButton: resolve(__dirname, 'src/scripts/content/contentFavButton.ts'),
+        injectButtonUI: resolve(__dirname, 'src/scripts/content/injectButtonUI.ts'),
         background: resolve(__dirname, 'src/scripts/background/background.ts'),
       },
 
@@ -26,7 +26,7 @@ export default defineConfig({
         entryFileNames(chunk) {
           if (chunk.name === 'background') return 'assets/app/scripts/background/[name].js';
 
-          if (chunk.name === 'contentScript' || chunk.name === 'contentFavButton')
+          if (chunk.name === 'contentScript' || chunk.name === 'injectButtonUI')
             return 'assets/app/scripts/content/[name].js';
 
           return 'assets/app/ui/[name].js';

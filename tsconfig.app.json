@@ -29,7 +29,7 @@
   "include": [
     "src",
     "src/scripts/content/contentScript.ts",
-    "src/scripts/content/contentFavButton.ts",
+    "src/scripts/content/injectButtonUI.ts",
     "public"
   ],
   "exclude": ["node_modules", "dist"]

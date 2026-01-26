@@ -1,7 +1,22 @@
+// import { cs } from '../../scripts/shared/constants';
+// import { sendToBackground } from '../../utils/actions/messages';
+
+import { useEffect, useState } from 'react';
 import { cs } from '../../scripts/shared/constants';
-import { sendToBackground } from '../../utils/actions/messages';
 
 export const Popup = () => {
+  const [canOpenPanel, setCanOpenPanel] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+
+      setCanOpenPanel(cs.ALLOWED_EXTENSION(tab?.url));
+    })();
+  }, []);
   const openSidePanel = async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab.id) {
@@ -11,17 +26,21 @@ export const Popup = () => {
         return;
       }
 
-      await sendToBackground({
-        type: cs.OPEN_PANEL,
-        payload: { currentTab: tab },
-      });
+      await chrome.sidePanel.open({ tabId: tab.id });
     }
   };
 
   return (
     <button
-      //bg-[#e1002d]
-      className='bg-yt-accent-red font-bold hover:cursor-pointer hover:bg-red-700 px-3 py-2 rounded-2xl w-full'
+      disabled={!canOpenPanel}
+      className={`
+      w-full px-3 py-2 rounded-2xl font-medium transition
+      ${
+        canOpenPanel
+          ? 'bg-yt-accent-red text-white hover:bg-red-700 cursor-pointer'
+          : 'bg-[#e5e5e5] text-[#909090] cursor-not-allowed'
+      }
+    `}
       onClick={openSidePanel}
     >
       Open Playlist Viewer

@@ -32,7 +32,7 @@ let tabUrl: string = '';
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (!tab.url || !info.url) return;
   tabUrl = tab.url;
-  if (tabUrl.includes(cs.ORIGIN)) {
+  if (cs.ALLOWED_EXTENSION(tabUrl)) {
     console.log('[BG] Sending message of tab onUpdated', { info, tab });
     try {
       await chrome.tabs.sendMessage(tabId, { action: 'url_change', payload: { tab } });
@@ -47,7 +47,7 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
   const tab = await chrome.tabs.get(tabId);
   if (!tab.url) return;
 
-  if (tab.url.includes(cs.ORIGIN)) {
+  if (cs.ALLOWED_EXTENSION(tab.url)) {
     console.log('[BG] Sending message of tab onActivated', { tab });
     try {
       await chrome.tabs.sendMessage(tabId, { action: 'url_change', payload: { tab } });
@@ -62,15 +62,6 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
 });
 
 chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
-  if (res.type === cs.OPEN_PANEL) {
-    const { id } = res.payload.currentTab;
-    (async () => {
-      await chrome.sidePanel.open({ tabId: id });
-    })();
-
-    return true;
-  }
-
   if (res.type === cs.IS_SAVED) {
     const cID = res.payload.currentId;
     chrome.storage.local.get('download-ready').then((sg) => {

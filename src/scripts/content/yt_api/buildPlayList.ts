@@ -100,7 +100,7 @@ async function loadPLaylistImages(videos: NodeListOf<HTMLElement>) {
     behavior: 'smooth',
     top: heighToScroll,
   });
-  await sleep(1500);
+  await sleep(2000);
 
   // 3) Return to original position
   containerToScroll.scrollTo(0, originalPos || 0);
