@@ -30,13 +30,13 @@ function SidePanel() {
     if (!multiPlaylist) return;
     console.log('Rendering Multi-playlist...', { multiPlaylist });
     return (
-      <div>
+      <>
         {Object.entries(multiPlaylist).map(([key, val]) => {
           console.log({ storageKey: key, videos: val });
           const video = val[0];
 
           return (
-            <div className='flex flex-1 items-center p-2 hover:bg-yt-bg-tertiary cursor-pointer'>
+            <div className='flex flex-1 items-center p-2 pt-3 hover:bg-yt-bg-tertiary cursor-pointer'>
               <div className='flex flex-1 items-center'>
                 <a hidden href={video.url!} />
                 {/* <img
@@ -46,7 +46,7 @@ function SidePanel() {
                 /> */}
 
                 <Thumbnail
-                  className='w-28'
+                  className='w-32'
                   src={video.thumbImg}
                   count={val.length}
                   variant='stacked'
@@ -69,13 +69,13 @@ function SidePanel() {
             </div>
           );
         })}
-      </div>
+      </>
     );
   };
 
   return (
-    <main className='bg-yt-bg w-full h-lvh p-2 text-yt-text-primary'>
-      <div className='relative flex flex-col min-w-3xs h-full bg-yt-bg shadow-lg border rounded-xl border-yt-border  overflow-y-hidden'>
+    <main className='bg-yt-bg w-full h-lvh p-1 text-yt-text-primary'>
+      <div className='relative flex flex-col min-w-3xs h-full bg-yt-bg shadow-lg border rounded-2xl border-yt-border_2  overflow-y-hidden'>
         {/* ------ Loading JSON header ----- */}
         <div className='flex items-center justify-between p-4 bg-yt-bg-secondary w-full'>
           <div className='flex flex-col'>
