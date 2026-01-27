@@ -1,0 +1,16 @@
+import { QueueListIcon } from '@heroicons/react/20/solid';
+
+type CountChipProps = {
+  count: number;
+};
+
+export function CountChip({ count }: CountChipProps) {
+  return (
+    <div className='absolute bottom-1 right-1 z-20 flex items-center gap-1 rounded-md bg-yt-border/60 px-1 py-1 text-xs font-semibold text-white'>
+      <div className='flex gap-0.5 justify-center items-center'>
+        <QueueListIcon width={14} />
+        <span>Videos {count}</span>
+      </div>
+    </div>
+  );
+}

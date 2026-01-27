@@ -9,6 +9,7 @@ import { ArrowUpOnSquareStackIcon } from '@heroicons/react/20/solid';
 
 import type { StoragePlaylist, Video } from '../../types/video';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { Thumbnail } from '../../components/Thumbnail';
 
 function SidePanel() {
   const [_playlist, setPlaylist] = useState<Video[]>([]);
@@ -29,48 +30,50 @@ function SidePanel() {
     if (!multiPlaylist) return;
     console.log('Rendering Multi-playlist...', { multiPlaylist });
     return (
-      <>
+      <div>
         {Object.entries(multiPlaylist).map(([key, val]) => {
           console.log({ storageKey: key, videos: val });
-          return val.map((v) => {
-            const video = v;
+          const video = val[0];
 
-            return (
-              <div className='flex flex-1 items-center p-2'>
-                <div className='flex flex-1 items-center'>
-                  <a hidden href={video.url!} />
-                  <img
-                    src={video.thumbImg}
-                    alt={video.title || 'thumbnail'}
-                    className='w-28 object-cover rounded'
-                  />
-                  <div className='self-baseline h-full flex-1 ml-2'>
-                    <h4 className='font-medium truncate whitespace-normal'>
-                      <span className='line-clamp-2'>
-                        {key} - {val.length}
-                      </span>
-                    </h4>
-                  </div>
-                </div>
-                <div className='opacity-0 w-6 h-6 hover:opacity-100'>
-                  <button
-                    className='hover:cursor-pointer'
-                    type='button'
-                    onClick={(e) => console.log(e)}
-                  >
-                    <XMarkIcon width={20} />
-                  </button>
+          return (
+            <div className='flex flex-1 items-center p-2 hover:bg-yt-bg-tertiary cursor-pointer'>
+              <div className='flex flex-1 items-center'>
+                <a hidden href={video.url!} />
+                {/* <img
+                  src={video.thumbImg}
+                  alt={video.title || 'thumbnail'}
+                  className='w-28 object-cover rounded'
+                /> */}
+
+                <Thumbnail
+                  className='w-28'
+                  src={video.thumbImg}
+                  count={val.length}
+                  variant='stacked'
+                />
+                <div className='self-baseline h-full flex-1 ml-2'>
+                  <h2 className='font-black truncate whitespace-normal text-[14px]'>
+                    <span className='line-clamp-2'>{key}</span>
+                  </h2>
                 </div>
               </div>
-            );
-          });
+              <div className='opacity-0 w-6 h-6 hover:opacity-100'>
+                <button
+                  className='hover:cursor-pointer'
+                  type='button'
+                  onClick={(e) => console.log(e)}
+                >
+                  <XMarkIcon width={20} />
+                </button>
+              </div>
+            </div>
+          );
         })}
-      </>
+      </div>
     );
   };
 
   return (
-    // TODO: Fixing bug with the height display on Side Panel.
     <main className='bg-yt-bg w-full h-lvh p-2 text-yt-text-primary'>
       <div className='relative flex flex-col min-w-3xs h-full bg-yt-bg shadow-lg border rounded-xl border-yt-border  overflow-y-hidden'>
         {/* ------ Loading JSON header ----- */}
