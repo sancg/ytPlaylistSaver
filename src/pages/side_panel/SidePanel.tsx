@@ -8,8 +8,7 @@ import { BackgroundResponse, sendToBackground } from '../../utils/actions/messag
 import { ArrowUpOnSquareStackIcon } from '@heroicons/react/20/solid';
 
 import type { StoragePlaylist, Video } from '../../types/video';
-import { XMarkIcon } from '@heroicons/react/24/outline';
-import { Thumbnail } from '../../components/Thumbnail';
+import { WtList } from '../../features/playlist/components/WtList';
 
 function SidePanel() {
   const [_playlist, setPlaylist] = useState<Video[]>([]);
@@ -35,39 +34,7 @@ function SidePanel() {
           console.log({ storageKey: key, videos: val });
           const video = val[0];
 
-          return (
-            <div className='flex flex-1 items-center p-2 pt-3 hover:bg-yt-bg-tertiary cursor-pointer'>
-              <div className='flex flex-1 items-center'>
-                <a hidden href={video.url!} />
-                {/* <img
-                  src={video.thumbImg}
-                  alt={video.title || 'thumbnail'}
-                  className='w-28 object-cover rounded'
-                /> */}
-
-                <Thumbnail
-                  className='w-32'
-                  src={video.thumbImg}
-                  count={val.length}
-                  variant='stacked'
-                />
-                <div className='self-baseline h-full flex-1 ml-2'>
-                  <h2 className='font-black truncate whitespace-normal text-[14px]'>
-                    <span className='line-clamp-2'>{key}</span>
-                  </h2>
-                </div>
-              </div>
-              <div className='opacity-0 w-6 h-6 hover:opacity-100'>
-                <button
-                  className='hover:cursor-pointer'
-                  type='button'
-                  onClick={(e) => console.log(e)}
-                >
-                  <XMarkIcon width={20} />
-                </button>
-              </div>
-            </div>
-          );
+          return <WtList playList={[video]} imgVariant='stacked' chip={val.length} />;
         })}
       </>
     );
