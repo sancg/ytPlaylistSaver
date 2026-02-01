@@ -2,19 +2,30 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { Video } from '../../../types/video';
 import { ThumbnailVariant } from '../../../components/Thumbnail';
 import { Item } from './Item';
+import { WtListSkeletonItem } from './SkeletonWtList';
 
 type props = {
   playList: Video[];
+  isLoading?: boolean;
   imgVariant: ThumbnailVariant;
   chip?: number | string;
   title?: string;
+  onClick?: () => void;
 };
-export const WtList = ({ playList, imgVariant, chip, title }: props) => {
+export const WtList = ({ playList, isLoading, imgVariant, chip, title, onClick }: props) => {
+  if (isLoading) {
+    return (
+      <div>
+        <WtListSkeletonItem items={1} />
+      </div>
+    );
+  }
+
   return (
     <div>
       {playList.map((video) => {
         return (
-          <>
+          <div onClick={onClick}>
             <a
               className='flex flex-1 items-center p-2 hover:bg-yt-bg-tertiary cursor-pointer'
               href={video.url}
@@ -31,7 +42,7 @@ export const WtList = ({ playList, imgVariant, chip, title }: props) => {
                 </button>
               </div>
             </a>
-          </>
+          </div>
         );
       })}
     </div>
