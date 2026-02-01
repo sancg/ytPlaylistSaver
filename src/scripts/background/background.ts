@@ -61,11 +61,13 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
   handleTabState(tabId, tab.url, 'onActivated');
 });
 
+// IMPROVE: Is it possible to refactor in function base listeners?
+// docs.. https://developer.chrome.com/docs/extensions/develop/concepts/messaging#responses
 chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
   if (res.type === cs.IS_SAVED) {
     const cID = res.payload.currentId;
     chrome.storage.local.get('download-ready').then((sg) => {
-      const list: Video[] = sg['download-ready'] || [];
+      const list: Video[] = (sg['download-ready'] as []) || [];
       const exists = list.some((v) => {
         if (!v.id) {
           return false;
@@ -86,7 +88,7 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
         sendResponse({ error: 'no video provided on payload' });
       }
 
-      const list: Video[] = st['download-ready'] || [];
+      const list: Video[] = (st['download-ready'] as []) || [];
       const exists = list.some((v) => {
         if (!v.id) {
           return false;
@@ -111,7 +113,7 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
         sendResponse({ error: 'No id provided on payload' });
       }
 
-      const list: Video[] = st['download-ready'] || [];
+      const list: Video[] = (st['download-ready'] as []) || [];
       const updateList = list.filter((v) => v.id !== id);
       console.log(`Updated List: `, { list, updateList });
 
@@ -144,7 +146,7 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
 
   if (res.type === cs.REMOVE_VIDEO) {
     chrome.storage.local.get('download-ready').then((res) => {
-      const list: Video[] = res['download-ready'] || [];
+      const list: Video[] = (res['download-ready'] as []) || [];
       const next = list.filter((v) => v.id !== res.videoId);
 
       chrome.storage.local.set({ 'download-ready': next }).then(() => {
