@@ -34,7 +34,14 @@ function SidePanel() {
           console.log({ storageKey: key, videos: val });
           const video = val[0];
 
-          return <WtList playList={[video]} imgVariant='stacked' chip={val.length} />;
+          return (
+            <WtList
+              playList={[video]}
+              imgVariant='stacked'
+              chip={video.timeLength}
+              title={key}
+            />
+          );
         })}
       </>
     );

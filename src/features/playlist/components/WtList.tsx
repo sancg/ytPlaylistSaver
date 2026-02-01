@@ -1,13 +1,15 @@
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { Video } from '../../../types/video';
-import { Thumbnail, ThumbnailVariant } from '../../../components/Thumbnail';
+import { ThumbnailVariant } from '../../../components/Thumbnail';
+import { Item } from './Item';
 
 type props = {
   playList: Video[];
   imgVariant: ThumbnailVariant;
-  chip?: number;
+  chip?: number | string;
+  title?: string;
 };
-export const WtList = ({ playList, imgVariant, chip }: props) => {
+export const WtList = ({ playList, imgVariant, chip, title }: props) => {
   return (
     <div>
       {playList.map((video) => {
@@ -18,22 +20,7 @@ export const WtList = ({ playList, imgVariant, chip }: props) => {
               href={video.url}
               key={video.id}
             >
-              {/* <div className='h-full p-1 w-6'></div> */}
-              <div className='flex flex-1 items-center pt-2'>
-                <Thumbnail
-                  className='w-32'
-                  src={video.thumbImg}
-                  variant={imgVariant}
-                  count={chip}
-                />
-                <div className='self-baseline h-full flex-1 ml-2'>
-                  <h4 className='font-medium truncate whitespace-normal'>
-                    <span className='line-clamp-2'>
-                      {video.title} - {video.timeLength}
-                    </span>
-                  </h4>
-                </div>
-              </div>
+              <Item video={video} imgVariant={imgVariant} chip={chip} title={title} />
               <div className='opacity-0 w-6 h-6 hover:opacity-100'>
                 <button
                   className='hover:cursor-pointer'
