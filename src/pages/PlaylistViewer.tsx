@@ -16,8 +16,9 @@ export const PlaylistViewer: React.FC = () => {
 
   useEffect(() => {
     chrome.storage.local.get([STORAGE_KEY], (result) => {
-      if (result[STORAGE_KEY]) {
-        setPlaylist(result[STORAGE_KEY]);
+      const pl: Video[] = (result[STORAGE_KEY] as []) || [];
+      if (pl) {
+        setPlaylist(pl);
       }
     });
   }, []);
@@ -107,5 +108,5 @@ const root = createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
     <PlaylistViewer />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
