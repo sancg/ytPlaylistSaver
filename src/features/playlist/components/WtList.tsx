@@ -3,6 +3,7 @@ import type { Video } from '../../../types/video';
 import { ThumbnailVariant } from '../../../components/Thumbnail';
 import { Item } from './Item';
 import { WtListSkeletonItem } from './SkeletonWtList';
+import { ViewState } from '../types';
 
 type props = {
   playList: Video[];
@@ -10,9 +11,18 @@ type props = {
   imgVariant: ThumbnailVariant;
   chip?: number | string;
   title?: string;
+  viewState: Pick<ViewState, 'type'>;
   onClick?: () => void;
 };
-export const WtList = ({ playList, isLoading, imgVariant, chip, title, onClick }: props) => {
+export const WtList = ({
+  playList,
+  isLoading,
+  imgVariant,
+  chip,
+  title,
+  viewState,
+  onClick,
+}: props) => {
   if (isLoading) {
     return (
       <div>
@@ -31,7 +41,13 @@ export const WtList = ({ playList, isLoading, imgVariant, chip, title, onClick }
               href={video.url}
               key={video.id}
             >
-              <Item video={video} imgVariant={imgVariant} chip={chip} title={title} />
+              <Item
+                video={video}
+                imgVariant={imgVariant}
+                chip={chip}
+                title={title}
+                viewState={viewState}
+              />
               <div className='opacity-0 w-6 h-6 hover:opacity-100'>
                 <button
                   className='hover:cursor-pointer'
