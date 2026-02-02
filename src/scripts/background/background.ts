@@ -1,7 +1,9 @@
 import { cs } from '../shared/constants';
-import { handleTabState } from './handleStatePanel';
+import { handleAvailableSP } from './handleAvailableSP';
 import { checkCommandShortcuts } from './commands';
 import type { StoragePlaylist, Video } from '../../types/video';
+import type { SessionActionMessage } from '../../types/messages';
+import Handlers from './handleSession';
 
 console.log('[Background] Ready...');
 chrome.runtime.onInstalled.addListener((details) => {
@@ -40,7 +42,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
       console.info('onUpdated: cs is not available', error);
     }
   }
-  handleTabState(tabId, tabUrl, 'onUpdated');
+  handleAvailableSP(tabId, tabUrl, 'onUpdated');
 });
 
 chrome.tabs.onActivated.addListener(async ({ tabId }) => {
@@ -58,9 +60,24 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
       console.info('onActivated: cs is not available - ', error);
     }
   }
-  handleTabState(tabId, tab.url, 'onActivated');
+  handleAvailableSP(tabId, tab.url, 'onActivated');
 });
 
+// ----------------------------------
+// SESSION CONTROLLER
+// ----------------------------------
+chrome.runtime.onMessage.addListener((msg: SessionActionMessage, sender, sendResponse) => {
+  const handler = Handlers[msg.type];
+  if (!handler) {
+    return;
+  }
+
+  return handler(msg as any, sender, sendResponse);
+});
+
+// ---------------------------------
+// OPERATIONS ON UI -> VIDEOS CRUD
+// ---------------------------------
 // IMPROVE: Is it possible to refactor in function base listeners?
 // docs.. https://developer.chrome.com/docs/extensions/develop/concepts/messaging#responses
 chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {

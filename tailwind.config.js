@@ -12,6 +12,7 @@ module.exports = {
 
           // Border + divider
           border: '#3f3f3f', // Subtle border (like YouTube's)
+          br_new: '#ffffff40',
           border_2: 'rgba(255,255,255,0.2)',
           // Text colors
           text: {
