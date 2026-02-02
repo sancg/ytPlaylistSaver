@@ -1,6 +1,6 @@
 import { cs } from '../shared/constants';
 
-async function handleTabState(tabId: number, urlString: string, _trigger: string) {
+async function handleAvailableSP(tabId: number, urlString: string, _trigger: string) {
   const isWatch = cs.ALLOWED_EXTENSION(urlString);
   await chrome.sidePanel.setOptions({
     tabId,
@@ -9,4 +9,4 @@ async function handleTabState(tabId: number, urlString: string, _trigger: string
   });
 }
 
-export { handleTabState };
+export { handleAvailableSP };

@@ -76,7 +76,7 @@ export const PlaylistViewer: React.FC = () => {
   return (
     <main className='bg-yt-bg w-full p-4'>
       <div className='flex flex-col h-(--yt-screen) gap-4 lg:flex-row'>
-        <div className='w-full min-h-[600px] flex items-center justify-center bg-yt-bg rounded-xl border border-yt-bg-secondary'>
+        <div className='w-full min-h-150 flex items-center justify-center bg-yt-bg rounded-xl border border-yt-bg-secondary'>
           <Player video={currentVideo} />
         </div>
         <aside className='relative min-w-3xs bg-yt-bg overflow-y-auto shadow-lg border rounded-xl border-yt-border text-yt-text-primary '>

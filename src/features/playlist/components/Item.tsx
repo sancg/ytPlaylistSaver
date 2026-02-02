@@ -2,7 +2,7 @@ import { Thumbnail, ThumbnailVariant } from '../../../components/Thumbnail';
 import type { Video } from '../../../types/video';
 import { ViewState } from '../types';
 
-type state = Pick<ViewState, 'type'>;
+type state = Pick<ViewState, 'view'>;
 
 type props = {
   video: Video;
@@ -15,7 +15,7 @@ export const Item = ({ video, title, imgVariant, viewState, chip }: props) => {
   console.log({ video });
   return (
     <div
-      className={`flex flex-1 items-center ${viewState?.type === 'PLAYLISTS' ? 'pt-2' : ''}`}
+      className={`flex flex-1 items-center ${viewState?.view === 'PLAYLISTS' ? 'pt-2' : ''}`}
     >
       <Thumbnail className='w-32' src={video.thumbImg} variant={imgVariant} count={chip} />
       <div className='self-baseline h-full flex-1 ml-2'>

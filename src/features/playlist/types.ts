@@ -2,6 +2,6 @@
 type Direction = 'back' | 'forward';
 
 type ViewState =
-  | { type: 'PLAYLISTS'; direction?: Direction }
-  | { type: 'VIDEOS'; playlistId: string; direction?: Direction };
+  | { view: 'PLAYLISTS'; direction?: Direction }
+  | { view: 'VIDEOS'; playlistId: string; direction?: Direction };
 export type { ViewState };

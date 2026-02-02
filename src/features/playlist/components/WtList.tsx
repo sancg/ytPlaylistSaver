@@ -11,7 +11,7 @@ type props = {
   imgVariant: ThumbnailVariant;
   chip?: number | string;
   title?: string;
-  viewState: Pick<ViewState, 'type'>;
+  viewState: Pick<ViewState, 'view'>;
   onClick?: () => void;
 };
 export const WtList = ({
