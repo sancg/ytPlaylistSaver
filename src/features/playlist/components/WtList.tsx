@@ -4,7 +4,8 @@ import { ThumbnailVariant } from '../../../components/Thumbnail';
 import { Item } from './Item';
 import { WtListSkeletonItem } from './SkeletonWtList';
 import { ViewState } from '../types';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useRef } from 'react';
+import { useVisibleObserver } from '../hooks/useVisibleObserver';
 
 type props = {
   playList: Video[];
@@ -24,6 +25,10 @@ export const WtList = ({
   viewState,
   onClick,
 }: props) => {
+  const refContent = useRef<HTMLDivElement>(null);
+  const observe = useVisibleObserver(refContent.current, (el) => {
+    console.log(el);
+  });
   if (isLoading) {
     return (
       <div>
@@ -33,10 +38,10 @@ export const WtList = ({
   }
 
   return (
-    <div>
+    <div ref={refContent}>
       {playList.map((video) => {
         return (
-          <div>
+          <div ref={observe}>
             <div
               className='flex flex-1 items-center p-2 hover:bg-yt-bg-tertiary hover:cursor-pointer'
               onClick={() => {
