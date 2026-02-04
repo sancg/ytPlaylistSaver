@@ -22,6 +22,6 @@ interface GetPlaylistCall {
   error: string | null;
 }
 
-type StoragePlaylist = { [key: string]: Video[] };
+type StoragePlaylist = Record<string, Video[]>; // { [key: string]: Video[] };
 
 export { Video, ThumbList, GetPlaylistCall, StoragePlaylist };

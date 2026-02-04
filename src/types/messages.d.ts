@@ -18,5 +18,28 @@ type SessionActionMap = {
   VIDEO_CHANGED: { type: 'VIDEO_CHANGED'; videoId: string };
   SIDE_PANEL_OPEN: { type: 'SIDE_PANEL_OPEN'; open: boolean };
 };
+interface MessageMap {
+  GET_ALL_PLAYLIST: {
+    payload: void;
+    response: {
+      playlists: StoragePlaylist;
+    };
+  };
 
-export { SidePanelSession, SessionActionMap, SessionActionMessage };
+  UPLOAD_PLAYLIST: {
+    payload: {
+      name: string;
+      playlist: Video[];
+    };
+    response: {
+      status: 'ok';
+    };
+  };
+
+  GET_SESSION: {
+    payload: void;
+    response: SidePanelSession;
+  };
+}
+
+export { SidePanelSession, SessionActionMap, SessionActionMessage, MessageMap };
