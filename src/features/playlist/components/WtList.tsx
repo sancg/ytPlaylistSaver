@@ -4,7 +4,7 @@ import { ThumbnailVariant } from '../../../components/Thumbnail';
 import { Item } from './Item';
 import { WtListSkeletonItem } from './SkeletonWtList';
 import { ViewState } from '../types';
-import { Dispatch, SetStateAction, useRef } from 'react';
+import { useRef } from 'react';
 import { useVisibleObserver } from '../hooks/useVisibleObserver';
 
 type props = {
@@ -14,7 +14,7 @@ type props = {
   chip?: number | string;
   title?: string;
   viewState: Pick<ViewState, 'view'>;
-  onClick?: () => void | Dispatch<SetStateAction<Video | {}>>;
+  onItemClick?: (video: Video) => void;
 };
 export const WtList = ({
   playList,
@@ -23,7 +23,7 @@ export const WtList = ({
   chip,
   title,
   viewState,
-  onClick,
+  onItemClick,
 }: props) => {
   const refContent = useRef<HTMLDivElement>(null);
   const observe = useVisibleObserver(refContent.current, (el) => {
@@ -41,24 +41,17 @@ export const WtList = ({
     <div ref={refContent}>
       {playList.map((video) => {
         return (
-          <div ref={observe}>
+          <div>
             <div
+              ref={observe}
               className='flex flex-1 items-center p-2 hover:bg-yt-bg-tertiary hover:cursor-pointer'
-              onClick={() => {
-                // FIXME: Bug with lifting state to update current Video.
-                console.log({ onClick, view: viewState.view });
-                if (!onClick) {
-                  return;
-                }
-                if (viewState.view === 'PLAYLISTS') return onClick();
-                console.log(onClick.caller, onClick.name);
-              }}
+              onClick={() => onItemClick?.(video)}
               key={video.id}
             >
               <Item
                 video={video}
                 imgVariant={imgVariant}
-                chip={chip || video.timeLength}
+                chip={chip || video?.timeLength}
                 title={title}
                 viewState={viewState}
               />
