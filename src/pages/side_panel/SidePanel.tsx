@@ -49,26 +49,31 @@ function SidePanel() {
       type: cs.GET_VIDEOS,
     })
       .then((res) => {
-        if (!res.error && res.data) {
+        if (res.error) {
+          return;
+        }
+
+        if (res.data) {
           setMultiPlaylist(res.data);
+          sendToBackground<SidePanelSession>({ type: 'GET_SESSION' }).then((r) => {
+            if (r.view === 'PLAYLISTS') {
+              setPanelView({ view: r.view, direction: 'back' });
+              return;
+            }
+
+            if (r.view === 'VIDEOS') {
+              setPanelView({
+                view: r.view,
+                playlistId: r.playlistId,
+                direction: 'forward',
+              } as ViewState);
+              console.log({ Session: r, multiPlaylist });
+              setPlaylist(res.data![r.playlistId!]);
+            }
+          });
         }
       })
       .finally(() => setIsLoading(false));
-
-    sendToBackground<SidePanelSession>({ type: 'GET_SESSION' }).then((r) => {
-      if (r.view === 'PLAYLISTS') {
-        setPanelView({ view: r.view, direction: 'back' });
-        return;
-      }
-
-      if (r.view === 'VIDEOS') {
-        setPanelView({
-          view: r.view,
-          playlistId: r.playlistId,
-          direction: 'forward',
-        } as ViewState);
-      }
-    });
   }, []);
 
   const renderView = () => {

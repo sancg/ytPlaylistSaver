@@ -4,6 +4,7 @@ import { ThumbnailVariant } from '../../../components/Thumbnail';
 import { Item } from './Item';
 import { WtListSkeletonItem } from './SkeletonWtList';
 import { ViewState } from '../types';
+import { Dispatch, SetStateAction } from 'react';
 
 type props = {
   playList: Video[];
@@ -12,7 +13,7 @@ type props = {
   chip?: number | string;
   title?: string;
   viewState: Pick<ViewState, 'view'>;
-  onClick?: () => void;
+  onClick?: () => void | Dispatch<SetStateAction<Video | {}>>;
 };
 export const WtList = ({
   playList,
@@ -38,7 +39,15 @@ export const WtList = ({
           <div>
             <div
               className='flex flex-1 items-center p-2 hover:bg-yt-bg-tertiary hover:cursor-pointer'
-              onClick={onClick}
+              onClick={() => {
+                // FIXME: Bug with lifting state to update current Video.
+                console.log({ onClick, view: viewState.view });
+                if (!onClick) {
+                  return;
+                }
+                if (viewState.view === 'PLAYLISTS') return onClick();
+                console.log(onClick.caller, onClick.name);
+              }}
               key={video.id}
             >
               <Item
