@@ -1,9 +1,9 @@
 import { cs } from '../shared/constants';
 import { handleAvailableSP } from './handleAvailableSP';
 import { checkCommandShortcuts } from './commands';
-import type { StoragePlaylist, Video } from '../../types/video';
 import type { SessionActionMessage } from '../../types/messages';
 import Handlers from './handleSession';
+import type { Video } from '../../types/video';
 
 console.log('[Background] Ready...');
 chrome.runtime.onInstalled.addListener((details) => {
@@ -76,11 +76,56 @@ chrome.runtime.onMessage.addListener((msg: SessionActionMessage, sender, sendRes
 });
 
 // ---------------------------------
+// PLAYLIST MANAGER
+// ---------------------------------
+chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  if (!msg.type) {
+    return;
+  }
+
+  if (msg.type === cs.GET_ALL_PLAYLIST) {
+    chrome.storage.local.get('playlists').then((playlists) => {
+      sendResponse(playlists);
+    });
+
+    return true;
+  }
+
+  // ** UPLOAD PLAYLIST TO LOCAL_STORAGE **
+  if (msg.type === cs.UPLOAD_PLAYLIST) {
+    (async () => {
+      try {
+        const { name, playlist } = msg.payload;
+
+        const { playlists = {} } = await chrome.storage.local.get('playlists');
+
+        const updated = {
+          ...(playlists as object),
+          [name]: playlist,
+        };
+
+        await chrome.storage.local.set({ playlists: updated });
+
+        sendResponse({ status: 'ok' });
+      } catch (error) {
+        sendResponse({ error: String(error) });
+      }
+    })();
+
+    return true;
+  }
+
+  if (msg.type === cs.REMOVE_PLAYLIST) {
+  }
+});
+// ---------------------------------
 // OPERATIONS ON UI -> VIDEOS CRUD
 // ---------------------------------
 // IMPROVE: Is it possible to refactor in function base listeners?
 // docs.. https://developer.chrome.com/docs/extensions/develop/concepts/messaging#responses
 chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
+  if (!res.type) return;
+
   if (res.type === cs.IS_SAVED) {
     const cID = res.payload.currentId;
     chrome.storage.local.get('download-ready').then((sg) => {
@@ -152,15 +197,6 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
     return true;
   }
 
-  if (res.type === cs.GET_VIDEOS) {
-    chrome.storage.local.get<StoragePlaylist>(null).then((data) => {
-      console.log('[BG] Getting key-stored...', { data });
-      if (!res) sendResponse({ res, error: 'No data available' });
-      sendResponse({ data, error: null });
-    });
-    return true;
-  }
-
   if (res.type === cs.REMOVE_VIDEO) {
     chrome.storage.local.get('download-ready').then((res) => {
       const list: Video[] = (res['download-ready'] as []) || [];
@@ -171,6 +207,10 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
       });
     });
     return true;
+  }
+
+  if (res.type === 'play_video') {
+    // TODO: Send message to CS to replace location.href
   }
 
   return { error: 'Something happen on the listener' };
