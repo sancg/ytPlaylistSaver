@@ -24,23 +24,24 @@ function SidePanel() {
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  const handleSelectView = (playlistId: string) => {
+  const [playlist, setPlaylist] = useState<Video[]>([]);
+  const [multiPlaylist, setMultiPlaylist] = useState<StoragePlaylist>({});
+  const [currentVideo, _setCurrentVideo] = useState<Video | null>(null);
+
+  const handlePlaylistView = (playlistId: string) => {
     const newState: ViewState = { view: 'VIDEOS', playlistId, direction: 'forward' };
     sendToBackground<SessionActionMessage>({ type: 'SET_SESSION', payload: newState }).then(
       (r) => console.log(r),
     );
     setPanelView(newState);
+    setPlaylist(multiPlaylist[playlistId]); //
   };
 
   const handleBack = () => {
-    const newState: ViewState = { view: 'PLAYLISTS', direction: 'back' };
+    const newState = { view: 'PLAYLISTS', direction: 'back', playlistId: null };
     sendToBackground<SessionActionMessage>({ type: 'SET_SESSION', payload: newState });
-    setPanelView(newState);
+    setPanelView(newState as ViewState);
   };
-
-  const [_playlist, setPlaylist] = useState<Video[]>([]);
-  const [multiPlaylist, setMultiPlaylist] = useState<StoragePlaylist>({});
-  const [currentVideo, _setCurrentVideo] = useState<Video | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -93,7 +94,7 @@ function SidePanel() {
                 chip={val.length}
                 title={plName}
                 viewState={panelView}
-                onClick={() => handleSelectView(plName)}
+                onClick={() => handlePlaylistView(plName)}
               />
             );
           })}
@@ -104,16 +105,9 @@ function SidePanel() {
           {isLoading ? (
             <WtListSkeletonItem items={12} />
           ) : (
-            panelView.view === 'VIDEOS' &&
-            multiPlaylist[panelView.playlistId]?.map((video) => (
-              <WtList
-                key={video.id}
-                playList={[video]}
-                imgVariant='single'
-                title={video.title}
-                viewState={panelView}
-              />
-            ))
+            panelView.view === 'VIDEOS' && (
+              <WtList playList={playlist} imgVariant='single' viewState={panelView} />
+            )
           )}
         </div>
       </div>
@@ -123,7 +117,7 @@ function SidePanel() {
     <main className='bg-yt-bg w-full h-lvh p-1 text-yt-text-primary'>
       <div className='relative flex flex-col min-w-3xs h-full bg-yt-bg shadow-lg border rounded-2xl border-yt-br_new  overflow-y-hidden'>
         {/* ------ Loading JSON header ----- */}
-        <div className='flex items-center justify-between py-4 px-2 bg-yt-bg-secondary w-full'>
+        <div className='flex items-center justify-between py-4 px-2 bg-yt-bg-secondary w-full h-18'>
           <div className='flex flex-col'>
             <div className='flex items-center gap-2'>
               {panelView.view === 'VIDEOS' ? (
@@ -135,10 +129,10 @@ function SidePanel() {
                 </button>
               ) : (
                 <button
-                  className='text-sm font-medium hover:bg-yt-border'
+                  className='text-sm font-medium p-1 rounded-3xl hover:cursor-pointer hover:bg-yt-border'
                   type='button'
                   onClick={() => {
-                    sendToBackground({ type: cs.AVAILABLE_LIST }).then((r) => console.log(r));
+                    sendToBackground({ type: cs.AVAILABLE_LIST });
                   }}
                 >
                   <BuildingLibraryIcon className='w-5' />
@@ -151,8 +145,8 @@ function SidePanel() {
             </div>
             {currentVideo ? <span>1/2</span> : ''}
           </div>
-          {panelView.view === 'VIDEOS' && (
-            <label className='flex min-w-28 px-3 py-2 justify-around place-items-center cursor-pointer font-bold text-sm bg-yt-bg-tertiary rounded-2xl shadow-2xl hover:bg-yt-border'>
+          {panelView.view === 'PLAYLISTS' ? (
+            <label className='flex min-w-28 px-3 py-2 justify-around place-items-center cursor-pointer font-bold text-sm bg-yt-bg-tertiary rounded-2xl border border-yt-border hover:bg-yt-border'>
               <ArrowUpOnSquareStackIcon width={20} />
               Upload
               <input
@@ -162,6 +156,8 @@ function SidePanel() {
                 onChange={(ev) => handleFileUpload(ev, setPlaylist)}
               />
             </label>
+          ) : (
+            <button className='min-w-28 py-2 px-3 rounded-2xl ring ring-yt-border'></button>
           )}
         </div>
 

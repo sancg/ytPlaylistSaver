@@ -35,16 +35,16 @@ export const WtList = ({
     <div>
       {playList.map((video) => {
         return (
-          <div onClick={onClick}>
-            <a
-              className='flex flex-1 items-center p-2 hover:bg-yt-bg-tertiary cursor-pointer'
-              href={video.url}
+          <div>
+            <div
+              className='flex flex-1 items-center p-2 hover:bg-yt-bg-tertiary hover:cursor-pointer'
+              onClick={onClick}
               key={video.id}
             >
               <Item
                 video={video}
                 imgVariant={imgVariant}
-                chip={chip}
+                chip={chip || video.timeLength}
                 title={title}
                 viewState={viewState}
               />
@@ -52,12 +52,16 @@ export const WtList = ({
                 <button
                   className='hover:cursor-pointer'
                   type='button'
-                  onClick={(e) => console.log(e)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log(e);
+                  }}
                 >
                   <XMarkIcon width={20} />
                 </button>
               </div>
-            </a>
+            </div>
           </div>
         );
       })}
