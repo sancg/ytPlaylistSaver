@@ -4,6 +4,8 @@ import { ThumbnailVariant } from '../../../components/Thumbnail';
 import { Item } from './Item';
 import { WtListSkeletonItem } from './SkeletonWtList';
 import { ViewState } from '../types';
+import { useRef } from 'react';
+import { useVisibleObserver } from '../hooks/useVisibleObserver';
 
 type props = {
   playList: Video[];
@@ -12,7 +14,7 @@ type props = {
   chip?: number | string;
   title?: string;
   viewState: Pick<ViewState, 'view'>;
-  onClick?: () => void;
+  onItemClick?: (video: Video) => void;
 };
 export const WtList = ({
   playList,
@@ -21,8 +23,12 @@ export const WtList = ({
   chip,
   title,
   viewState,
-  onClick,
+  onItemClick,
 }: props) => {
+  const refContent = useRef<HTMLDivElement>(null);
+  const observe = useVisibleObserver(refContent.current, (el) => {
+    console.log(el);
+  });
   if (isLoading) {
     return (
       <div>
@@ -32,19 +38,20 @@ export const WtList = ({
   }
 
   return (
-    <div>
+    <div ref={refContent}>
       {playList.map((video) => {
         return (
-          <div onClick={onClick}>
-            <a
-              className='flex flex-1 items-center p-2 hover:bg-yt-bg-tertiary cursor-pointer'
-              href={video.url}
+          <div>
+            <div
+              ref={observe}
+              className='flex flex-1 items-center p-2 hover:bg-yt-bg-tertiary hover:cursor-pointer'
+              onClick={() => onItemClick?.(video)}
               key={video.id}
             >
               <Item
                 video={video}
                 imgVariant={imgVariant}
-                chip={chip}
+                chip={chip || video?.timeLength}
                 title={title}
                 viewState={viewState}
               />
@@ -52,12 +59,16 @@ export const WtList = ({
                 <button
                   className='hover:cursor-pointer'
                   type='button'
-                  onClick={(e) => console.log(e)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log(e);
+                  }}
                 >
                   <XMarkIcon width={20} />
                 </button>
               </div>
-            </a>
+            </div>
           </div>
         );
       })}

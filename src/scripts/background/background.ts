@@ -1,9 +1,9 @@
 import { cs } from '../shared/constants';
 import { handleAvailableSP } from './handleAvailableSP';
 import { checkCommandShortcuts } from './commands';
-import type { StoragePlaylist, Video } from '../../types/video';
-import type { SessionActionMessage } from '../../types/messages';
-import Handlers from './handleSession';
+import Handlers from './handleBackgroundActions';
+import type { Video } from '../../types/video';
+import { CoordinatorMessage } from '../../types/messages';
 
 console.log('[Background] Ready...');
 chrome.runtime.onInstalled.addListener((details) => {
@@ -64,9 +64,9 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
 });
 
 // ----------------------------------
-// SESSION CONTROLLER
+// ACTIONS
 // ----------------------------------
-chrome.runtime.onMessage.addListener((msg: SessionActionMessage, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((msg: CoordinatorMessage, sender, sendResponse) => {
   const handler = Handlers[msg.type];
   if (!handler) {
     return;
@@ -81,6 +81,8 @@ chrome.runtime.onMessage.addListener((msg: SessionActionMessage, sender, sendRes
 // IMPROVE: Is it possible to refactor in function base listeners?
 // docs.. https://developer.chrome.com/docs/extensions/develop/concepts/messaging#responses
 chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
+  if (!res.type) return;
+
   if (res.type === cs.IS_SAVED) {
     const cID = res.payload.currentId;
     chrome.storage.local.get('download-ready').then((sg) => {
@@ -152,15 +154,6 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
     return true;
   }
 
-  if (res.type === cs.GET_VIDEOS) {
-    chrome.storage.local.get<StoragePlaylist>(null).then((data) => {
-      console.log('[BG] Getting key-stored...', { data });
-      if (!res) sendResponse({ res, error: 'No data available' });
-      sendResponse({ data, error: null });
-    });
-    return true;
-  }
-
   if (res.type === cs.REMOVE_VIDEO) {
     chrome.storage.local.get('download-ready').then((res) => {
       const list: Video[] = (res['download-ready'] as []) || [];
@@ -171,6 +164,10 @@ chrome.runtime.onMessage.addListener((res, _sender, sendResponse) => {
       });
     });
     return true;
+  }
+
+  if (res.type === 'play_video') {
+    // TODO: Send message to CS to replace location.href
   }
 
   return { error: 'Something happen on the listener' };
