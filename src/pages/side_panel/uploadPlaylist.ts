@@ -1,5 +1,6 @@
 import { extractYouTubeID } from '../../scripts/content/yt_api/extraYoutube';
-import type { Video } from '../../types/video';
+import type { StoragePlaylist, Video } from '../../types/video';
+import { sendToBackground } from '../../utils/actions/messages';
 
 const normalizePlaylist = (obj: {
   playlist?: Video[];
@@ -17,10 +18,13 @@ const normalizePlaylist = (obj: {
 // Handle File Upload
 const handleFileUpload = (
   event: React.ChangeEvent<HTMLInputElement>,
-  setPlaylist: React.Dispatch<React.SetStateAction<Video[]>>
+  setPlaylist: React.Dispatch<React.SetStateAction<Video[]>>,
+  setMultiPlaylist: React.Dispatch<React.SetStateAction<StoragePlaylist>>,
 ) => {
   const file = event.target.files?.[0];
   if (!file) return;
+
+  const stripName = file.name.replace('.json', '').trim();
 
   const reader = new FileReader();
   reader.onload = (e) => {
@@ -35,6 +39,12 @@ const handleFileUpload = (
         return;
       }
 
+      sendToBackground({
+        type: 'UPLOAD_PLAYLIST',
+        payload: { name: stripName, playlist: uploadedPlaylist },
+      });
+
+      setMultiPlaylist((prev) => ({ ...prev, [stripName]: uploadedPlaylist }));
       setPlaylist(uploadedPlaylist);
     } catch (err) {
       console.error('Error parsing JSON file', err);
