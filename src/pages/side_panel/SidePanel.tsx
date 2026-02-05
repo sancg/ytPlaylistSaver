@@ -51,14 +51,16 @@ function SidePanel() {
     sendToBackground({
       type: 'GET_ALL_PLAYLIST',
     })
-      .then((r: any) => {
-        if (!r.playlists) return;
-        setMultiPlaylist(r.playlists);
+      .then(async (r: any) => {
+        let pl = r.playlists ?? {};
+        setMultiPlaylist(pl);
 
-        return sendToBackground({ type: 'GET_SESSION' }).then((session: unknown) => ({
+        const session = await sendToBackground({ type: 'GET_SESSION' });
+
+        return {
           session: session as Partial<SidePanelSession>,
-          playlists: r.playlists as StoragePlaylist,
-        }));
+          playlists: pl as StoragePlaylist,
+        };
       })
       .then((d) => {
         const { session, playlists } = d!;
