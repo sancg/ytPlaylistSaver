@@ -31,9 +31,11 @@ const Handlers: { [K in keyof CoordinatorActionMap]: Handler<K> } = {
   },
 
   PLAY_VIDEO: (msg) => {
+    const { payload } = msg;
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-      if (tab?.id) chrome.tabs.sendMessage(tab.id, msg);
+      if (tab?.id) chrome.tabs.sendMessage(tab.id, { action: 'play_video', payload });
     });
+    return;
   },
 
   VIDEO_CHANGED: (msg) => {
@@ -49,35 +51,29 @@ const Handlers: { [K in keyof CoordinatorActionMap]: Handler<K> } = {
 
   GET_ALL_PLAYLIST: (_, __, sendResponse) => {
     chrome.storage.local.get('playlists').then((playlists) => {
-      sendResponse(playlists as StoragePlaylist);
+      console.info(`[BG ACTIONS] getting all playlists: `, playlists);
+      sendResponse((playlists as StoragePlaylist) || {});
     });
 
     return true;
   },
 
   UPLOAD_PLAYLIST: (msg, _, sendResponse) => {
-    try {
-      const { name, playlist } = msg.payload;
+    (async () => {
+      try {
+        const { name, playlist } = msg.payload;
+        const result = await chrome.storage.local.get('playlists');
+        const playlists = (result.playlists ?? {}) as StoragePlaylist;
 
-      chrome.storage.local
-        .get('playlists')
-        .then((playlists) => {
-          const updated = {
-            ...(playlists as object),
-            [name]: playlist,
-          };
-          return updated;
-        })
-        .then(async (update) => {
-          await chrome.storage.local.set({ playlists: update });
-          sendResponse(msg.response);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    } catch (error) {
-      sendResponse({ error: String(error) });
-    }
+        const updated: StoragePlaylist = { ...playlists, [name]: playlist };
+        await chrome.storage.local.set({ playlists: updated });
+
+        sendResponse({ status: 'ok' });
+      } catch (error) {
+        sendResponse({ error: String(error) });
+      }
+      console.info('[BG ACTIONS] Update playlists:', await chrome.storage.local.get(null));
+    })();
 
     return true;
   },
