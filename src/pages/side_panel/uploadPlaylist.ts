@@ -1,5 +1,4 @@
 import { extractYouTubeID } from '../../scripts/content/yt_api/extraYoutube';
-import { cs } from '../../scripts/shared/constants';
 import type { StoragePlaylist, Video } from '../../types/video';
 import { sendToBackground } from '../../utils/actions/messages';
 
@@ -41,7 +40,7 @@ const handleFileUpload = (
       }
 
       sendToBackground({
-        type: cs.UPLOAD_PLAYLIST,
+        type: 'UPLOAD_PLAYLIST',
         payload: { name: stripName, playlist: uploadedPlaylist },
       });
 

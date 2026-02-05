@@ -2,9 +2,9 @@ import '../../styles/global.css';
 import '../../styles/app.css';
 import React, { useEffect, useState } from 'react';
 import handleFileUpload from './uploadPlaylist';
-import { cs } from '../../scripts/shared/constants';
+
 import { createRoot } from 'react-dom/client';
-import { bgPlaylistManager, sendToBackground } from '../../utils/actions/messages';
+import { sendToBackground } from '../../utils/actions/messages';
 import {
   ArrowLeftStartOnRectangleIcon,
   ArrowUpOnSquareStackIcon,
@@ -12,7 +12,7 @@ import {
 
 import type { ViewState } from '../../features/playlist/types';
 import type { StoragePlaylist, Video } from '../../types/video';
-import type { SessionActionMessage } from '../../types/messages';
+import type { SidePanelSession } from '../../types/messages';
 import { WtList } from '../../features/playlist/components/WtList';
 import { WtListSkeletonItem } from '../../features/playlist/components/SkeletonWtList';
 import { BuildingLibraryIcon } from '@heroicons/react/24/outline';
@@ -29,16 +29,19 @@ function SidePanel() {
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
 
   const handleForwardView = (playlistId: string) => {
-    const newState: ViewState = { view: 'VIDEOS', playlistId, direction: 'forward' };
-    sendToBackground<SessionActionMessage>({ type: 'SET_SESSION', payload: newState });
+    const newState = { view: 'VIDEOS', playlistId, direction: 'forward' };
+    sendToBackground({
+      type: 'SET_SESSION',
+      payload: newState as Partial<SidePanelSession>,
+    });
 
-    setPanelView(newState);
+    setPanelView(newState as ViewState);
     setPlaylist(multiPlaylist[playlistId]);
   };
 
   const handleBackView = () => {
-    const newState = { view: 'PLAYLISTS', direction: 'back', playlistId: null };
-    sendToBackground<SessionActionMessage>({ type: 'SET_SESSION', payload: newState });
+    const newState: unknown = { view: 'PLAYLISTS', direction: 'back', playlistId: null };
+    sendToBackground({ type: 'SET_SESSION', payload: newState as Partial<SidePanelSession> });
     setPanelView(newState as ViewState);
   };
 
@@ -46,16 +49,15 @@ function SidePanel() {
     setIsLoading(true);
 
     sendToBackground({
-      type: cs.GET_ALL_PLAYLIST,
+      type: 'GET_ALL_PLAYLIST',
     })
       .then((r: any) => {
-        console.log(r);
         if (!r.playlists) return;
         setMultiPlaylist(r.playlists);
 
-        return bgPlaylistManager('GET_SESSION', undefined).then((session) => ({
-          session,
-          playlists: r.playlists,
+        return sendToBackground({ type: 'GET_SESSION' }).then((session: unknown) => ({
+          session: session as Partial<SidePanelSession>,
+          playlists: r.playlists as StoragePlaylist,
         }));
       })
       .then((d) => {
@@ -81,7 +83,7 @@ function SidePanel() {
   const handleActiveVideo = (video: Video) => {
     console.info(`[SIDE_PANEL] Selecting video: `, video);
     setCurrentVideo(video);
-    sendToBackground({ type: 'play_video', payload: { video } });
+    sendToBackground({ type: 'PLAY_VIDEO', payload: { videoId: video.id } });
   };
   const renderView = () => {
     return (
@@ -118,7 +120,7 @@ function SidePanel() {
                 playList={playlist}
                 imgVariant='single'
                 viewState={panelView}
-                onItemClick={() => handleActiveVideo}
+                onItemClick={handleActiveVideo}
               />
             )
           )}
@@ -145,7 +147,7 @@ function SidePanel() {
                   className='text-sm font-medium p-1 rounded-3xl hover:cursor-pointer hover:bg-yt-border'
                   type='button'
                   onClick={() => {
-                    sendToBackground({ type: cs.AVAILABLE_LIST });
+                    sendToBackground({ type: 'SIDE_PANEL_OPEN', payload: { open: false } });
                   }}
                 >
                   <BuildingLibraryIcon className='w-5' />

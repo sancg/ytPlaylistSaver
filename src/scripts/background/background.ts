@@ -1,9 +1,9 @@
 import { cs } from '../shared/constants';
 import { handleAvailableSP } from './handleAvailableSP';
 import { checkCommandShortcuts } from './commands';
-import type { SessionActionMessage } from '../../types/messages';
-import Handlers from './handleSession';
+import Handlers from './handleBackgroundActions';
 import type { Video } from '../../types/video';
+import { CoordinatorMessage } from '../../types/messages';
 
 console.log('[Background] Ready...');
 chrome.runtime.onInstalled.addListener((details) => {
@@ -64,9 +64,9 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
 });
 
 // ----------------------------------
-// SESSION CONTROLLER
+// ACTIONS
 // ----------------------------------
-chrome.runtime.onMessage.addListener((msg: SessionActionMessage, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((msg: CoordinatorMessage, sender, sendResponse) => {
   const handler = Handlers[msg.type];
   if (!handler) {
     return;
@@ -75,49 +75,6 @@ chrome.runtime.onMessage.addListener((msg: SessionActionMessage, sender, sendRes
   return handler(msg as any, sender, sendResponse);
 });
 
-// ---------------------------------
-// PLAYLIST MANAGER
-// ---------------------------------
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-  if (!msg.type) {
-    return;
-  }
-
-  if (msg.type === cs.GET_ALL_PLAYLIST) {
-    chrome.storage.local.get('playlists').then((playlists) => {
-      sendResponse(playlists);
-    });
-
-    return true;
-  }
-
-  // ** UPLOAD PLAYLIST TO LOCAL_STORAGE **
-  if (msg.type === cs.UPLOAD_PLAYLIST) {
-    (async () => {
-      try {
-        const { name, playlist } = msg.payload;
-
-        const { playlists = {} } = await chrome.storage.local.get('playlists');
-
-        const updated = {
-          ...(playlists as object),
-          [name]: playlist,
-        };
-
-        await chrome.storage.local.set({ playlists: updated });
-
-        sendResponse({ status: 'ok' });
-      } catch (error) {
-        sendResponse({ error: String(error) });
-      }
-    })();
-
-    return true;
-  }
-
-  if (msg.type === cs.REMOVE_PLAYLIST) {
-  }
-});
 // ---------------------------------
 // OPERATIONS ON UI -> VIDEOS CRUD
 // ---------------------------------
