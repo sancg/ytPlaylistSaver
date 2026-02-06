@@ -6,7 +6,7 @@ type Video = {
   thumbnailList?: ThumbList[];
   publishedBy?: string;
   timeLength?: string;
-  currentIndex?: boolean;
+  currentIndex?: boolean | number;
   addedAt?: number;
 };
 
