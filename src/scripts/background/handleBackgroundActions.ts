@@ -35,7 +35,7 @@ const Handlers: { [K in keyof CoordinatorActionMap]: Handler<K> } = {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       if (tab?.id) chrome.tabs.sendMessage(tab.id, { action: 'play_video', payload });
     });
-    return;
+    return true;
   },
 
   VIDEO_CHANGED: (msg) => {
@@ -45,6 +45,7 @@ const Handlers: { [K in keyof CoordinatorActionMap]: Handler<K> } = {
   },
 
   SIDE_PANEL_OPEN: (msg) => {
+    console.info(`[BG ACTIONS] signal that side_panel is open`);
     chrome.storage.sync;
     sidePanelOpen = msg.payload.open;
   },

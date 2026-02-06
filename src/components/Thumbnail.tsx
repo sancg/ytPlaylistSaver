@@ -10,6 +10,7 @@ type ThumbnailProps = {
   count?: number | string;
   className?: string;
   imageClassName?: string;
+  activeVideoId?: boolean;
 };
 
 export function Thumbnail({
@@ -19,6 +20,7 @@ export function Thumbnail({
   count,
   className = '',
   imageClassName = '',
+  activeVideoId,
 }: ThumbnailProps) {
   // const ref = useRef<HTMLDivElement>(null);
   // const [visible, setVisible] = useState(false);
@@ -60,7 +62,7 @@ export function Thumbnail({
           loading='lazy'
           src={src}
           alt={alt}
-          className={`relative z-10 h-full w-full rounded-md border-t border-t-black object-cover ${imageClassName}`}
+          className={`relative z-10 h-full w-full rounded-md object-cover ${imageClassName} ${activeVideoId && 'border-2 border-yt-text-primary'}`}
         />
 
         {count && <CountChip count={count} />}

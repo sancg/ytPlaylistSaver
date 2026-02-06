@@ -5,17 +5,14 @@ import handleFileUpload from './uploadPlaylist';
 
 import { createRoot } from 'react-dom/client';
 import { sendToBackground } from '../../utils/actions/messages';
-import {
-  ArrowLeftStartOnRectangleIcon,
-  ArrowUpOnSquareStackIcon,
-} from '@heroicons/react/20/solid';
+import { ArrowUpOnSquareStackIcon, BuildingLibraryIcon } from '@heroicons/react/20/solid';
 
 import type { ViewState } from '../../features/playlist/types';
 import type { StoragePlaylist, Video } from '../../types/video';
 import type { SidePanelSession } from '../../types/messages';
 import { WtList } from '../../features/playlist/components/WtList';
 import { WtListSkeletonItem } from '../../features/playlist/components/SkeletonWtList';
-import { BuildingLibraryIcon } from '@heroicons/react/24/outline';
+import { PlaybackCount } from '../../features/playlist/components/PlaybackCount';
 
 function SidePanel() {
   const [panelView, setPanelView] = useState<ViewState>({
@@ -119,6 +116,7 @@ function SidePanel() {
           ) : (
             panelView.view === 'VIDEOS' && (
               <WtList
+                activeVideoId={currentVideo?.id}
                 playList={playlist}
                 imgVariant='single'
                 viewState={panelView}
@@ -133,34 +131,34 @@ function SidePanel() {
   return (
     <main className='bg-yt-bg w-full h-lvh p-1 text-yt-text-primary'>
       <div className='relative flex flex-col min-w-3xs h-full bg-yt-bg shadow-lg border rounded-2xl border-yt-br_new  overflow-y-hidden'>
-        {/* ------ Loading JSON header ----- */}
-        <div className='flex items-center gap-2 justify-between py-4 px-2 bg-yt-bg-secondary w-full h-18'>
+        {/* ------ SIDE_PANEL HEADER WITH RENDER CONDITIONS ----- */}
+        <div className='flex items-center gap-2 justify-between py-4 px-1 bg-yt-bg-secondary w-full h-18'>
           <div className='flex flex-col'>
             <div className='flex items-center gap-2'>
               {panelView.view === 'VIDEOS' ? (
-                <button
-                  className='text-sm font-medium p-1 rounded-3xl hover:cursor-pointer hover:bg-yt-border'
-                  onClick={handleBackView}
-                >
-                  <ArrowLeftStartOnRectangleIcon className='w-5' />
-                </button>
+                <PlaybackCount
+                  actionClick={handleBackView}
+                  playlistId={panelView.playlistId}
+                  totalItems={playlist.length}
+                  activeVideoIndex={currentVideo?.currentIndex}
+                />
               ) : (
-                <button
-                  className='text-sm font-medium p-1 rounded-3xl hover:cursor-pointer hover:bg-yt-border'
-                  type='button'
-                  onClick={() => {
-                    sendToBackground({ type: 'SIDE_PANEL_OPEN', payload: { open: false } });
-                  }}
-                >
-                  <BuildingLibraryIcon className='w-5' />
-                </button>
+                <>
+                  <button
+                    className='text-sm font-medium p-2 rounded-full hover:cursor-pointer hover:bg-yt-text-muted'
+                    type='button'
+                    onClick={() => {
+                      sendToBackground({ type: 'SIDE_PANEL_OPEN', payload: { open: false } });
+                    }}
+                  >
+                    <BuildingLibraryIcon className='w-6' />
+                  </button>
+                  <h2 className='text-base font-black truncate whitespace-normal line-clamp-1'>
+                    Home WtLists
+                  </h2>
+                </>
               )}
-
-              <h2 className='text-base font-black truncate whitespace-normal line-clamp-1'>
-                {panelView.view === 'PLAYLISTS' ? 'Playlists' : panelView.playlistId}
-              </h2>
             </div>
-            {currentVideo ? <span>1/2</span> : ''}
           </div>
           {panelView.view === 'PLAYLISTS' ? (
             <label className='flex min-w-28 px-3 py-2 justify-around place-items-center cursor-pointer font-bold text-sm bg-yt-bg-tertiary rounded-2xl border border-yt-border hover:bg-yt-border'>
