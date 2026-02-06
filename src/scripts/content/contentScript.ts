@@ -59,7 +59,11 @@ chrome.runtime.onMessage.addListener((req, _sender, sendResponse) => {
       })();
 
       return true;
+    case 'play_video':
+      window.location.href = `https://www.youtube.com/watch?v=${req.payload.videoId}`;
+      chrome.runtime.sendMessage({ type: 'SIDE_PANEL_OPEN', payload: { open: true } });
 
+      return;
     default:
       console.info('Action not registered', req.action);
       return { success: true };
