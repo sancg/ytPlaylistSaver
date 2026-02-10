@@ -40,6 +40,8 @@ function SidePanel() {
     const newState: unknown = { view: 'PLAYLISTS', direction: 'back', playlistId: null };
     sendToBackground({ type: 'SET_SESSION', payload: newState as Partial<SidePanelSession> });
     setPanelView(newState as ViewState);
+    // Reset currentVideo
+    setCurrentVideo(null);
   };
 
   useEffect(() => {

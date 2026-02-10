@@ -47,7 +47,7 @@ chrome.runtime.onMessage.addListener((req, _sender, sendResponse) => {
       injectAddVideo();
       return true;
 
-    case 'extract_playlist':
+    case 'extract_pl':
       (async () => {
         try {
           const result = await buildContentPlaylist(document);

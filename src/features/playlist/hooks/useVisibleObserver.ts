@@ -12,6 +12,7 @@ export function useVisibleObserver(
     observerRef.current = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
+          console.log(entry);
           if (entry.isIntersecting) {
             onVisible(entry.target);
           }
