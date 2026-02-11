@@ -1,6 +1,9 @@
 module.exports = {
   theme: {
     extend: {
+      text: {
+        xxs: '0.67rem',
+      },
       colors: {
         yt: {
           // Background layers

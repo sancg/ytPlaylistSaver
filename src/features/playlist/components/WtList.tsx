@@ -57,7 +57,7 @@ export const WtList = ({
           <div ref={refContent} className='ref-content'>
             <div
               ref={observe}
-              className={`flex flex-1 items-center py-2 hover:bg-yt-bg-tertiary hover:cursor-pointer`}
+              className={`flex items-center py-2 hover:bg-yt-bg-tertiary hover:cursor-pointer`}
               onClick={() => {
                 // Avoid repeating click on played video.
                 if (activeVideoId !== video.id && viewState.view === 'VIDEOS')
