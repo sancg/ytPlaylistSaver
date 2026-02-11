@@ -15,21 +15,26 @@ type props = {
 export const Item = ({ video, title, imgVariant, viewState, chip, activeVideoId }: props) => {
   const currentVideo = video.id === activeVideoId;
   return (
-    <div className={`flex flex-1 items-center pt-2`}>
+    <div className={`flex flex-1 items-center pt-2 gap-2 md:w-80`}>
       <Thumbnail
-        className='w-32'
+        className='w-28'
         src={video.thumbImg}
         variant={imgVariant}
         count={chip}
         activeVideoId={currentVideo}
       />
-      <div className='self-baseline h-full flex-1 ml-2'>
+      <div className='flex flex-col gap-1.5 self-baseline h-full flex-1'>
         <h4
           className={`font-extrabold truncate whitespace-normal ${viewState?.view === 'VIDEOS' ? 'text-xs' : 'text-base'}`}
           title={title}
         >
           <span className='line-clamp-2'>{title ? <span>{title}</span> : video.title}</span>
         </h4>
+        {viewState?.view === 'VIDEOS' && (
+          <div className='truncate whitespace-normal text-yt-text-muted text-xxs'>
+            <span className='line-clamp-1'>{video.publishedBy}</span>
+          </div>
+        )}
       </div>
     </div>
   );

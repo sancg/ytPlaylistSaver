@@ -7,6 +7,7 @@ import { ViewState } from '../types';
 import { useRef } from 'react';
 import { useVisibleObserver } from '../hooks/useVisibleObserver';
 import { PlayIcon } from '@heroicons/react/20/solid';
+import { useRipple } from '../hooks/useRipple';
 
 type props = {
   playList: Video[];
@@ -29,6 +30,8 @@ export const WtList = ({
   onItemClick,
 }: props) => {
   const refContent = useRef<HTMLDivElement>(null);
+  const { containerRef: buttonRef, createBorderRipple } = useRipple();
+
   const observe = useVisibleObserver(refContent.current, (_el) => {});
 
   const renderIndex = (video: Video, id: string) => {
@@ -54,17 +57,20 @@ export const WtList = ({
     <div>
       {playList.map((video, idx) => {
         return (
-          <div ref={refContent} className='ref-content'>
+          <div
+            key={video.id}
+            ref={refContent}
+            className='ref-content relative group inline-block w-full'
+          >
             <div
               ref={observe}
-              className={`flex flex-1 items-center py-2 hover:bg-yt-bg-tertiary hover:cursor-pointer`}
+              className={`flex items-center py-2 hover:bg-yt-bg-tertiary hover:cursor-pointer hover:opacity-100`}
               onClick={() => {
                 // Avoid repeating click on played video.
                 if (activeVideoId !== video.id && viewState.view === 'VIDEOS')
                   return onItemClick?.({ ...video, currentIndex: idx + 1 });
                 else if (viewState.view === 'PLAYLISTS') return onItemClick?.(video);
               }}
-              key={video.id}
             >
               {renderIndex(video, activeVideoId!)}
               <Item
@@ -75,17 +81,22 @@ export const WtList = ({
                 title={title}
                 viewState={viewState}
               />
-              <div className='opacity-0 w-6 h-6 hover:opacity-100'>
+              <div className='w-10 flex items-center justify-center opacity-0 translate-x-1 scale-90 group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 transition-all duration-150 ease-out'>
                 <button
-                  className='hover:cursor-pointer'
+                  className='relative overflow-hidden w-full h-10 rounded-full transition-colors duration-200 hover:cursor-pointer active:bg-white/20'
                   type='button'
+                  ref={buttonRef}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     console.log(e);
                   }}
+                  onPointerUp={(e) => {
+                    createBorderRipple(e);
+                    e.stopPropagation();
+                  }}
                 >
-                  <XMarkIcon width={20} />
+                  <XMarkIcon className='w-6 h-6 m-auto' />
                 </button>
               </div>
             </div>
