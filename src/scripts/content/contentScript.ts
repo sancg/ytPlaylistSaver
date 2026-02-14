@@ -60,8 +60,11 @@ chrome.runtime.onMessage.addListener((req, _sender, sendResponse) => {
 
       return true;
     case 'play_video':
-      window.location.href = `https://www.youtube.com/watch?v=${req.payload.videoId}`;
       chrome.runtime.sendMessage({ type: 'SIDE_PANEL_OPEN', payload: { open: true } });
+      const a = document.createElement('a');
+      a.href = `/watch?v=${req.payload.videoId}`;
+      a.click();
+      a.remove();
 
       return;
     default:

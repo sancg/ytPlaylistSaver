@@ -3,6 +3,7 @@ module.exports = {
     extend: {
       text: {
         xxs: '0.67rem',
+        md: '0.75rem',
       },
       colors: {
         yt: {
