@@ -4,15 +4,14 @@ import React, { useEffect, useState } from 'react';
 import handleFileUpload from './uploadPlaylist';
 
 import { createRoot } from 'react-dom/client';
-import { sendToBackground } from '../../utils/actions/messages';
 import { ArrowUpOnSquareStackIcon, BuildingLibraryIcon } from '@heroicons/react/20/solid';
 
 import type { ViewState } from '../../features/playlist/types';
 import type { StoragePlaylist, Video } from '../../types/video';
 import type { SidePanelSession } from '../../types/messages';
-import { WtList } from '../../features/playlist/components/WtList';
-import { WtListSkeletonItem } from '../../features/playlist/components/SkeletonWtList';
-import { PlaybackCount } from '../../features/playlist/components/PlaybackCount';
+
+import { sendToBackground } from '../../utils/actions';
+import { PlaybackCount, SnackSkeleton, WtList } from '../../features/playlist/components';
 
 function SidePanel() {
   const [panelView, setPanelView] = useState<ViewState>({
@@ -84,7 +83,10 @@ function SidePanel() {
   const handleActiveVideo = (video: Video) => {
     console.info(`[SIDE_PANEL] Selecting video: `, video);
     setCurrentVideo(video);
-    sendToBackground({ type: 'PLAY_VIDEO', payload: { videoId: video.id } });
+    sendToBackground({
+      type: 'PLAY_VIDEO',
+      payload: { videoId: video.id, index: video.currentIndex as number },
+    });
   };
   const renderView = () => {
     return (
@@ -96,25 +98,29 @@ function SidePanel() {
         }`}
       >
         {/* PLAYLISTS VIEW */}
-        <div className='w-full shrink-0 overflow-y-scroll yt-scrollbar'>
-          {Object.entries(multiPlaylist).map(([plName, values]) => {
-            return (
-              <WtList
-                playList={[values[0]]}
-                imgVariant='stacked'
-                viewState={panelView}
-                title={plName}
-                chip={values.length}
-                onItemClick={() => handleForwardView(plName)}
-              />
-            );
-          })}
+        <div className='w-full shrink-0 overflow-y-auto yt-scrollbar'>
+          {isLoading ? (
+            <SnackSkeleton items={12} />
+          ) : (
+            Object.entries(multiPlaylist).map(([plName, values]) => {
+              return (
+                <WtList
+                  playList={[values[0]]}
+                  imgVariant='stacked'
+                  viewState={panelView}
+                  title={plName}
+                  chip={values.length}
+                  onItemClick={() => handleForwardView(plName)}
+                />
+              );
+            })
+          )}
         </div>
 
         {/* VIDEOS VIEW */}
-        <div className='w-full shrink-0 overflow-y-scroll yt-scrollbar'>
+        <div className='w-full shrink-0 overflow-y-scroll overflow-x-hidden yt-scrollbar'>
           {isLoading ? (
-            <WtListSkeletonItem items={12} />
+            <SnackSkeleton items={12} />
           ) : (
             panelView.view === 'VIDEOS' && (
               <WtList

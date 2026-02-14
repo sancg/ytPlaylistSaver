@@ -12,7 +12,14 @@ type props = {
   viewState?: state;
   activeVideoId?: string;
 };
-export const Item = ({ video, title, imgVariant, viewState, chip, activeVideoId }: props) => {
+export default function Snack({
+  video,
+  title,
+  imgVariant,
+  viewState,
+  chip,
+  activeVideoId,
+}: props) {
   const currentVideo = video.id === activeVideoId;
   return (
     <div className={`flex flex-1 items-center pt-2 gap-2 md:w-80`}>
@@ -25,7 +32,7 @@ export const Item = ({ video, title, imgVariant, viewState, chip, activeVideoId 
       />
       <div className='flex flex-col gap-1.5 self-baseline h-full flex-1'>
         <h4
-          className={`font-extrabold truncate whitespace-normal ${viewState?.view === 'VIDEOS' ? 'text-xs' : 'text-base'}`}
+          className={`font-extrabold truncate whitespace-normal ${viewState?.view === 'VIDEOS' ? 'text-xs' : 'text-md'}`}
           title={title}
         >
           <span className='line-clamp-2'>{title ? <span>{title}</span> : video.title}</span>
@@ -38,4 +45,4 @@ export const Item = ({ video, title, imgVariant, viewState, chip, activeVideoId 
       </div>
     </div>
   );
-};
+}
