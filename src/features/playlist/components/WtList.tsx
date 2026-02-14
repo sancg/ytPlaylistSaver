@@ -1,13 +1,15 @@
-import { XMarkIcon } from '@heroicons/react/24/outline';
-import type { Video } from '../../../types/video';
-import { ThumbnailVariant } from '../../../components/Thumbnail';
-import { Item } from './Item';
-import { WtListSkeletonItem } from './SkeletonWtList';
-import { ViewState } from '../types';
 import { useRef } from 'react';
 import { useVisibleObserver } from '../hooks/useVisibleObserver';
-import { PlayIcon } from '@heroicons/react/20/solid';
 import { useRipple } from '../hooks/useRipple';
+
+import { PlayIcon } from '@heroicons/react/20/solid';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+
+import type { Video } from '../../../types/video';
+import type { ThumbnailVariant } from '../../../components/Thumbnail';
+import type { ViewState } from '../types';
+
+import { Snack, SnackSkeleton } from '.';
 
 type props = {
   playList: Video[];
@@ -19,7 +21,8 @@ type props = {
   activeVideoId?: string;
   onItemClick?: (video: Video) => void;
 };
-export const WtList = ({
+
+export default function WtList({
   playList,
   isLoading,
   imgVariant,
@@ -28,7 +31,7 @@ export const WtList = ({
   viewState,
   activeVideoId,
   onItemClick,
-}: props) => {
+}: props) {
   const refContent = useRef<HTMLDivElement>(null);
   const { containerRef: buttonRef, createBorderRipple } = useRipple();
 
@@ -46,11 +49,7 @@ export const WtList = ({
   };
 
   if (isLoading) {
-    return (
-      <div>
-        <WtListSkeletonItem items={1} />
-      </div>
-    );
+    return <SnackSkeleton items={1} />;
   }
 
   return (
@@ -73,7 +72,7 @@ export const WtList = ({
               }}
             >
               {renderIndex(video, activeVideoId!)}
-              <Item
+              <Snack
                 video={video}
                 activeVideoId={activeVideoId}
                 imgVariant={imgVariant}
@@ -83,13 +82,12 @@ export const WtList = ({
               />
               <div className='w-10 flex items-center justify-center opacity-0 translate-x-1 scale-90 group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 transition-all duration-150 ease-out'>
                 <button
-                  className='relative overflow-hidden w-full h-10 rounded-full transition-colors duration-200 hover:cursor-pointer active:bg-white/20'
+                  className='relative overflow-hidden w-full h-10 rounded-full transition-colors duration-200 hover:cursor-pointer hover:bg-white/10 active:bg-white/20'
                   type='button'
                   ref={buttonRef}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log(e);
                   }}
                   onPointerUp={(e) => {
                     createBorderRipple(e);
@@ -105,4 +103,4 @@ export const WtList = ({
       })}
     </div>
   );
-};
+}
