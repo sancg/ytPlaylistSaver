@@ -45,7 +45,7 @@ export default function WtList({
         </div>
       );
     }
-    return <div className='h-full p-1'></div>;
+    return;
   };
 
   if (isLoading) {
@@ -63,7 +63,7 @@ export default function WtList({
           >
             <div
               ref={observe}
-              className={`flex items-center py-2 hover:bg-yt-bg-tertiary hover:cursor-pointer hover:opacity-100`}
+              className={`flex justify-center gap-1 items-center py-2 hover:bg-yt-bg-tertiary hover:cursor-pointer hover:opacity-100`}
               onClick={() => {
                 // Avoid repeating click on played video.
                 if (activeVideoId !== video.id && viewState.view === 'VIDEOS')
@@ -80,7 +80,7 @@ export default function WtList({
                 title={title}
                 viewState={viewState}
               />
-              <div className='w-10 flex items-center justify-center opacity-0 translate-x-1 scale-90 group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 transition-all duration-150 ease-out'>
+              <div className='w-10 mr-1 flex items-center justify-center opacity-0 translate-x-1 scale-90 group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 transition-all duration-100 ease-out'>
                 <button
                   className='relative overflow-hidden w-full h-10 rounded-full transition-colors duration-200 hover:cursor-pointer hover:bg-white/10 active:bg-white/20'
                   type='button'

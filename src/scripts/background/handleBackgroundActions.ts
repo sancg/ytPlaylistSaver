@@ -44,6 +44,15 @@ const Handlers: { [K in keyof CoordinatorActionMap]: Handler<K> } = {
     }
   },
 
+  VIDEO_PL_ENDED: (msg) => {
+    console.log(`[BG ACTIONS] signal event: VIDEO_ENDED`, msg);
+    // IMPROVE: Workflow at this point should include index
+    (async () => {
+      const activePl = await chrome.storage.local.get('');
+      console.log(activePl);
+    })();
+  },
+
   SIDE_PANEL_OPEN: (msg) => {
     console.info(`[BG ACTIONS] signal that side_panel is open`);
     chrome.storage.sync;

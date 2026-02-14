@@ -14,7 +14,8 @@ type SidePanelSession = {
 type CoordinatorActionMap = {
   GET_SESSION: { type: 'GET_SESSION' };
   SET_SESSION: { type: 'SET_SESSION'; payload: Partial<SidePanelSession> };
-  PLAY_VIDEO: { type: 'PLAY_VIDEO'; payload: { videoId: string } };
+  PLAY_VIDEO: { type: 'PLAY_VIDEO'; payload: { videoId: string; index: number } };
+  VIDEO_PL_ENDED: { type: 'VIDEO_PL_ENDED'; payload: { videoId: string; timestamp?: number } };
   VIDEO_CHANGED: { type: 'VIDEO_CHANGED'; payload: { videoId: string } };
   SIDE_PANEL_OPEN: { type: 'SIDE_PANEL_OPEN'; payload: { open: boolean } };
 

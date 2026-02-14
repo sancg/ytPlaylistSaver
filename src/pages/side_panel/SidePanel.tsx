@@ -152,13 +152,7 @@ function SidePanel() {
                 />
               ) : (
                 <>
-                  <button
-                    className='text-sm font-medium p-2 rounded-full hover:cursor-pointer hover:bg-yt-text-muted'
-                    type='button'
-                    onClick={() => {
-                      sendToBackground({ type: 'SIDE_PANEL_OPEN', payload: { open: false } });
-                    }}
-                  >
+                  <button className='rounded-lg px-4 py-2 ring-2 ring-blue-300 hover:ring-3 transition-transform'>
                     <BuildingLibraryIcon className='w-6' />
                   </button>
                   <h2 className='text-base font-black truncate whitespace-normal line-clamp-1'>
@@ -180,7 +174,7 @@ function SidePanel() {
               />
             </label>
           ) : (
-            <button className='min-w-28 py-2 px-3 rounded-2xl ring ring-yt-border'></button>
+            <button className='py-2 px-3 rounded-2xl ring ring-yt-border'></button>
           )}
         </div>
 

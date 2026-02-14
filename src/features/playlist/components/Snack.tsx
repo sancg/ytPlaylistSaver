@@ -24,7 +24,7 @@ export default function Snack({
   return (
     <div className={`flex flex-1 items-center pt-2 gap-2 md:w-80`}>
       <Thumbnail
-        className='w-28'
+        className={`w-28 ${!currentVideo && 'ml-2'}`}
         src={video.thumbImg}
         variant={imgVariant}
         count={chip}
