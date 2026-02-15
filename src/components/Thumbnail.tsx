@@ -37,7 +37,7 @@ export function Thumbnail({
           loading='lazy'
           src={src}
           alt={alt}
-          className={`relative z-10 h-full w-full rounded-md object-cover ${imageClassName} ${activeVideoId && 'border-2 border-yt-text-primary'}`}
+          className={`relative z-10 h-full w-full rounded-md object-cover ${imageClassName} ${activeVideoId && 'ring-2 ring-yt-text-muted'}`}
         />
 
         {count && <CountChip count={count} />}

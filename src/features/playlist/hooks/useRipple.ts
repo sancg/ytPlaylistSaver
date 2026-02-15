@@ -1,5 +1,4 @@
 import { useRef } from 'react';
-import '../../../styles/app.css';
 
 export function useRipple() {
   const containerRef = useRef<HTMLButtonElement | null>(null);
@@ -46,7 +45,7 @@ export function useRipple() {
 
     const ripple = document.createElement('span');
 
-    const size = Math.max(rect.width, rect.height) * 0.9;
+    const size = Math.max(rect.width, rect.height) * 0.99;
 
     // CENTER POSITION
     const x = rect.width / 2 - size / 2;

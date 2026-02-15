@@ -10,7 +10,7 @@ type props = {
   title?: string;
   chip?: string | number;
   viewState?: state;
-  activeVideoId?: string;
+  playingVideo?: boolean;
 };
 export default function Snack({
   video,
@@ -18,17 +18,16 @@ export default function Snack({
   imgVariant,
   viewState,
   chip,
-  activeVideoId,
+  playingVideo,
 }: props) {
-  const currentVideo = video.id === activeVideoId;
   return (
-    <div className={`flex flex-1 items-center pt-2 gap-2 md:w-80`}>
+    <div className={`flex flex-1 items-center ml-1 pt-2 gap-2 md:w-80`}>
       <Thumbnail
-        className={`w-28 ${!currentVideo && 'ml-2'}`}
+        className={`w-28 ${!playingVideo && 'ml-2'}`}
         src={video.thumbImg}
         variant={imgVariant}
         count={chip}
-        activeVideoId={currentVideo}
+        activeVideoId={playingVideo}
       />
       <div className='flex flex-col gap-1.5 self-baseline h-full flex-1'>
         <h4
