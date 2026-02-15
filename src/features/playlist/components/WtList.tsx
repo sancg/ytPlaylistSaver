@@ -36,15 +36,16 @@ export default function WtList({
 
   const observe = useVisibleObserver(refContent.current, (_el) => {});
 
-  const renderIndex = (video: Video, id: string) => {
-    if (video.id === id) {
-      return (
-        <div className='h-full p-1 w-auto'>
-          <PlayIcon width={14} className='m-auto' />
-        </div>
-      );
+  const renderIndex = (active: boolean) => {
+    if (!active) {
+      return;
     }
-    return;
+
+    return (
+      <div className='h-full ml-1 p-0.5 w-auto'>
+        <PlayIcon className='w-3.5 m-auto fill-yt-text-secondary/60' />
+      </div>
+    );
   };
 
   if (isLoading) {
@@ -54,34 +55,43 @@ export default function WtList({
   return (
     <div>
       {playList.map((video, idx) => {
+        const isPlayingVideo = activeVideoId === video.id;
+
         return (
           <div
             key={video.id}
             ref={refContent}
-            className='ref-content relative group inline-block w-full'
+            className={`ref-content relative group inline-block w-full ${isPlayingVideo && 'bg-yt-accent-hover-red/80'}`}
           >
             <div
               ref={observe}
-              className={`flex justify-center gap-1 items-center py-2 hover:bg-yt-bg-tertiary hover:cursor-pointer hover:opacity-100`}
+              className={`flex justify-center items-center py-2 hover:bg-yt-bg-tertiary hover:cursor-pointer hover:opacity-100`}
               onClick={() => {
-                // Avoid repeating click on played video.
-                if (activeVideoId !== video.id && viewState.view === 'VIDEOS')
-                  return onItemClick?.({ ...video, currentIndex: idx + 1 });
-                else if (viewState.view === 'PLAYLISTS') return onItemClick?.(video);
+                switch (viewState.view) {
+                  case 'VIDEOS':
+                    // Assign clickable function if it is NOT playingVideo
+                    if (!isPlayingVideo) {
+                      onItemClick?.({ ...video, currentIndex: idx + 1 });
+                    }
+                    break;
+                  default: // PLAYLISTS
+                    onItemClick?.(video);
+                    break;
+                }
               }}
             >
-              {renderIndex(video, activeVideoId!)}
+              {renderIndex(isPlayingVideo)}
               <Snack
                 video={video}
-                activeVideoId={activeVideoId}
+                playingVideo={isPlayingVideo}
                 imgVariant={imgVariant}
                 chip={chip || video?.timeLength}
                 title={title}
                 viewState={viewState}
               />
-              <div className='w-10 mr-1 flex items-center justify-center opacity-0 translate-x-1 scale-90 group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 transition-all duration-100 ease-out'>
+              <div className='w-10 mx-1 flex items-center justify-center opacity-0 translate-x-1 scale-90 group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 transition-all duration-100 ease-out'>
                 <button
-                  className='relative overflow-hidden w-full h-10 rounded-full transition-colors duration-200 hover:cursor-pointer hover:bg-white/10 active:bg-white/20'
+                  className='relative overflow-hidden w-full h-10 rounded-full transition-colors duration-150 hover:cursor-pointer hover:bg-white/10 active:bg-white/20'
                   type='button'
                   ref={buttonRef}
                   onClick={(e) => {

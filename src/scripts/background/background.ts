@@ -52,7 +52,9 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
   if (cs.ALLOWED_EXTENSION(tab.url)) {
     console.log('[BG] Sending message of tab onActivated', { tab });
     try {
-      await chrome.tabs.sendMessage(tabId, { action: 'url_change', payload: { tab } });
+      setTimeout(async () => {
+        await chrome.tabs.sendMessage(tabId, { action: 'url_change', payload: { tab } });
+      }, 300);
     } catch (error) {
       // FIXME: This error occurs when [CS] is not available at the time of execution
       // 1. Implement a debounce when sendMessage()
