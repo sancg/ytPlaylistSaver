@@ -2,8 +2,7 @@ import { useRef } from 'react';
 import { useVisibleObserver } from '../hooks/useVisibleObserver';
 import { useRipple } from '../hooks/useRipple';
 
-import { PlayIcon } from '@heroicons/react/20/solid';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { EllipsisVerticalIcon, PlayIcon } from '@heroicons/react/20/solid';
 
 import type { Video } from '../../../types/video';
 import type { ThumbnailVariant } from '../../../components/Thumbnail';
@@ -94,7 +93,7 @@ export default function WtList({
                     e.stopPropagation();
                   }}
                 >
-                  <XMarkIcon className='w-6 h-6 m-auto' />
+                  <EllipsisVerticalIcon className='w-6 h-6 m-auto' />
                 </button>
               </div>
             </div>

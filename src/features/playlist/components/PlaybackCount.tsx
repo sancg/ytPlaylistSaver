@@ -15,7 +15,7 @@ export default function PlaybackCount({
   return (
     <>
       <button
-        className='relative overflow-hidden text-sm w-full h-full font-medium p-2 rounded-full hover:cursor-pointer hover:bg-white/20'
+        className='relative overflow-hidden text-sm h-full font-medium p-2 rounded-full hover:cursor-pointer hover:bg-white/20'
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();

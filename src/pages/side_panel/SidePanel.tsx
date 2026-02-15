@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import handleFileUpload from './uploadPlaylist';
 
 import { createRoot } from 'react-dom/client';
-import { ArrowUpOnSquareStackIcon, BuildingLibraryIcon } from '@heroicons/react/20/solid';
+import { BuildingLibraryIcon } from '@heroicons/react/20/solid';
 
 import type { ViewState } from '../../features/playlist/types';
 import type { StoragePlaylist, Video } from '../../types/video';
@@ -12,6 +12,7 @@ import type { SidePanelSession } from '../../types/messages';
 
 import { sendToBackground } from '../../utils/actions';
 import { PlaybackCount, SnackSkeleton, WtList } from '../../features/playlist/components';
+import { DocumentArrowUpIcon } from '@heroicons/react/24/outline';
 
 function SidePanel() {
   const [panelView, setPanelView] = useState<ViewState>({
@@ -152,7 +153,7 @@ function SidePanel() {
                 />
               ) : (
                 <>
-                  <button className='rounded-lg px-4 py-2 ring-2 ring-blue-300 hover:ring-3 transition-transform'>
+                  <button className='relative overflow-hidden text-sm h-full font-medium p-2 rounded-full'>
                     <BuildingLibraryIcon className='w-6' />
                   </button>
                   <h2 className='text-base font-black truncate whitespace-normal line-clamp-1'>
@@ -162,9 +163,10 @@ function SidePanel() {
               )}
             </div>
           </div>
+          {/** BUTTON ACTIONS ON HEADER */}
           {panelView.view === 'PLAYLISTS' ? (
-            <label className='flex min-w-28 px-3 py-2 justify-around place-items-center cursor-pointer font-bold text-sm bg-yt-bg-tertiary rounded-2xl border border-yt-border hover:bg-yt-border'>
-              <ArrowUpOnSquareStackIcon width={20} />
+            <label className='flex gap-1 min-w-24 px-3 py-2 justify-around place-items-center cursor-pointer font-bold text-sm bg-yt-bg-tertiary rounded-full border border-yt-border hover:bg-yt-border'>
+              <DocumentArrowUpIcon width={20} />
               Upload
               <input
                 type='file'
@@ -176,6 +178,7 @@ function SidePanel() {
           ) : (
             <button className='py-2 px-3 rounded-2xl ring ring-yt-border'></button>
           )}
+          {/** ----------------------- */}
         </div>
 
         {/* VIEW STATE */}
